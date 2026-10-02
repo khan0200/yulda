@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-white text-yulda-black font-sans;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold transition-colors duration-150 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply btn bg-yulda-yellow text-yulda-black hover:bg-yulda-gold;
+  }
+
+  .btn-secondary {
+    @apply btn bg-yulda-black text-white hover:bg-yulda-charcoal;
+  }
+
+  .btn-outline {
+    @apply btn border border-yulda-gray-300 text-yulda-black hover:bg-yulda-gray-50;
+  }
+
+  .btn-ghost {
+    @apply btn text-yulda-black hover:bg-yulda-gray-100;
+  }
+
+  .card {
+    @apply rounded-2xl bg-white shadow-card border border-yulda-gray-100;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-yulda-gray-300 bg-white px-4 py-3 text-sm text-yulda-black placeholder:text-yulda-gray-400 focus:outline-none focus:ring-2 focus:ring-yulda-yellow focus:border-yulda-yellow transition-shadow;
+  }
+
+  .label {
+    @apply block text-sm font-medium text-yulda-gray-700 mb-1.5;
+  }
+}
