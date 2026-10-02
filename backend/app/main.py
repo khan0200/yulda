@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -17,6 +18,7 @@ from app.core.rate_limit import limiter
 from app.core.redis import close_redis, connect_to_redis
 from app.core.responses import ApiError
 from app.middleware.security_headers import SecurityHeadersMiddleware
+from app.services.route_expiry_task import run_expiry_loop
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("yulda")
@@ -24,11 +26,15 @@ logger = logging.getLogger("yulda")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    expiry_task: asyncio.Task | None = None
     if settings.ENV != "test":
         await connect_to_mongo()
         await connect_to_redis()
+        expiry_task = asyncio.create_task(run_expiry_loop())
     logger.info("%s backend started", settings.APP_NAME)
     yield
+    if expiry_task is not None:
+        expiry_task.cancel()
     if settings.ENV != "test":
         await close_mongo_connection()
         await close_redis()

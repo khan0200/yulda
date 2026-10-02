@@ -1,0 +1,32 @@
+# Yulda — robots.txt
+# Allow all major search engines, including ones weak at JS rendering
+# (Naver Yeti, Yandex) so they can at least crawl static routes and
+# the sitemap. See index.html for the static fallback metadata they see.
+
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /orders
+Disallow: /profile
+Disallow: /*/new
+Disallow: /api/
+
+# Googlebot
+User-agent: Googlebot
+Allow: /
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+
+# Naver's crawler
+User-agent: Yeti
+Allow: /
+
+# Yandex's crawler
+User-agent: YandexBot
+Allow: /
+
+Sitemap: https://yulda.app/sitemap.xml

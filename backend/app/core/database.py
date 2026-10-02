@@ -1,4 +1,6 @@
+import json
 import logging
+from pathlib import Path
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo.errors import PyMongoError
@@ -6,6 +8,8 @@ from pymongo.errors import PyMongoError
 from app.core.config import settings
 
 logger = logging.getLogger("yulda.database")
+
+PLACES_SEED_PATH = Path(__file__).resolve().parent.parent / "data" / "places_seed.json"
 
 _client: AsyncIOMotorClient | None = None
 _db: AsyncIOMotorDatabase | None = None
@@ -55,6 +59,49 @@ async def connect_to_mongo() -> None:
             raise
 
     await ensure_indexes()
+    await seed_places_if_empty()
+
+
+async def seed_places_if_empty() -> None:
+    db = get_database()
+    try:
+        existing = await db.places.estimated_document_count()
+    except PyMongoError:
+        logger.warning("Could not check places collection count — skipping seed")
+        return
+
+    if existing > 0:
+        logger.info("Places collection already has %d documents — skipping seed", existing)
+        return
+
+    if not PLACES_SEED_PATH.exists():
+        logger.warning("Places seed file not found at %s — skipping seed", PLACES_SEED_PATH)
+        return
+
+    with open(PLACES_SEED_PATH, encoding="utf-8") as f:
+        raw_places = json.load(f)
+
+    docs = [
+        {
+            "name": p["name"],
+            "ascii_name": p["ascii_name"],
+            "alt_names": p["alt_names"],
+            "country": p["country"],
+            "admin1": p["admin1"] or None,
+            "population": p["population"],
+            "lat": p["lat"],
+            "lon": p["lon"],
+            "source": "SEED",
+            "usage_count": 0,
+        }
+        for p in raw_places
+    ]
+
+    try:
+        await db.places.insert_many(docs, ordered=False)
+        logger.info("Seeded %d places", len(docs))
+    except PyMongoError:
+        logger.exception("Failed to seed places")
 
 
 async def close_mongo_connection() -> None:
@@ -157,3 +204,67 @@ async def _create_indexes(db: AsyncIOMotorDatabase) -> None:
 
     await db.reports.create_index("status")
     await db.admin_logs.create_index("created_at")
+
+    await db.community_posts.create_index("category")
+    await db.community_posts.create_index("city")
+    await db.community_posts.create_index("author_id")
+    await db.community_posts.create_index("created_at")
+    await db.community_posts.create_index([("title", "text"), ("body", "text")])
+    await db.community_posts.create_index([("location", "2dsphere")], sparse=True)
+
+    await db.community_comments.create_index("post_id")
+    await db.community_comments.create_index("created_at")
+
+    await db.places.create_index("name")
+    await db.places.create_index("ascii_name")
+    await db.places.create_index("alt_names")
+    await db.places.create_index("country")
+    await db.places.create_index([("name", 1), ("country", 1)])
+
+    await db.marketplace_listings.create_index("category")
+    await db.marketplace_listings.create_index("city")
+    await db.marketplace_listings.create_index("condition")
+    await db.marketplace_listings.create_index("status")
+    await db.marketplace_listings.create_index("price")
+    await db.marketplace_listings.create_index("owner_id")
+    await db.marketplace_listings.create_index("created_at")
+    await db.marketplace_listings.create_index([("title", "text"), ("description", "text")])
+    await db.marketplace_listings.create_index([("location", "2dsphere")], sparse=True)
+
+    await db.housing_listings.create_index("housing_type")
+    await db.housing_listings.create_index("city")
+    await db.housing_listings.create_index("status")
+    await db.housing_listings.create_index("deposit")
+    await db.housing_listings.create_index("monthly_rent")
+    await db.housing_listings.create_index("owner_id")
+    await db.housing_listings.create_index("created_at")
+    await db.housing_listings.create_index([("title", "text"), ("description", "text")])
+    await db.housing_listings.create_index([("location", "2dsphere")], sparse=True)
+
+    await db.auto_listings.create_index("listing_type")
+    await db.auto_listings.create_index("make")
+    await db.auto_listings.create_index("fuel_type")
+    await db.auto_listings.create_index("transmission")
+    await db.auto_listings.create_index("city")
+    await db.auto_listings.create_index("status")
+    await db.auto_listings.create_index("year")
+    await db.auto_listings.create_index("price")
+    await db.auto_listings.create_index("owner_id")
+    await db.auto_listings.create_index("created_at")
+    await db.auto_listings.create_index([("location", "2dsphere")], sparse=True)
+
+    await db.route_posts.create_index("post_type")
+    await db.route_posts.create_index("status")
+    await db.route_posts.create_index("stop_names_lower")
+    await db.route_posts.create_index("departure_at")
+    await db.route_posts.create_index("owner_id")
+    await db.route_posts.create_index("created_at")
+
+    await db.cargo_posts.create_index("post_type")
+    await db.cargo_posts.create_index("status")
+    await db.cargo_posts.create_index("origin_country")
+    await db.cargo_posts.create_index("destination_country")
+    await db.cargo_posts.create_index("stop_names_lower")
+    await db.cargo_posts.create_index("departure_at")
+    await db.cargo_posts.create_index("owner_id")
+    await db.cargo_posts.create_index("created_at")

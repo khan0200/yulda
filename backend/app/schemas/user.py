@@ -51,7 +51,7 @@ class ResetPasswordRequest(BaseModel):
 class UserPublic(BaseModel):
     model_config = ConfigDict(populate_by_name=True)
 
-    id: PyObjectId = Field(alias="_id")
+    id: PyObjectId = Field(validation_alias="_id", serialization_alias="id")
     email: EmailStr
     phone: str | None = None
     name: str

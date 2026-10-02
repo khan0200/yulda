@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
+
+import AppLogo from "@/components/common/AppLogo.vue";
 import PublicHeader from "@/components/navigation/PublicHeader.vue";
+
+const { t } = useI18n();
 </script>
 
 <template>
@@ -11,8 +16,8 @@ import PublicHeader from "@/components/navigation/PublicHeader.vue";
     <footer class="border-t border-yulda-gray-100 py-10">
       <div class="mx-auto max-w-7xl px-6">
         <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-          <span class="text-lg font-extrabold tracking-tight">YULDA</span>
-          <p class="text-sm text-yulda-gray-500">&copy; {{ new Date().getFullYear() }} Yulda. All rights reserved.</p>
+          <AppLogo :size="24" />
+          <p class="text-sm text-yulda-gray-500">&copy; {{ new Date().getFullYear() }} Yulda. {{ t("footer.rights") }}</p>
         </div>
       </div>
     </footer>

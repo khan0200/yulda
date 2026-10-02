@@ -24,6 +24,8 @@ class UserRepository:
         doc["created_at"] = now
         doc["updated_at"] = now
         doc["email"] = doc["email"].lower()
+        if doc.get("phone") is None:
+            doc.pop("phone", None)
         result = await self._collection.insert_one(doc)
         doc["_id"] = result.inserted_id
         return doc

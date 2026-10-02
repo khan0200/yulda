@@ -19,8 +19,13 @@ def _patch_infra():
 
     app.dependency_overrides[deps.get_db] = lambda: mock_db
     app.dependency_overrides[deps.get_redis_client] = lambda: fake_redis
-    yield
+    yield mock_db
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def db(_patch_infra):
+    return _patch_infra
 
 
 @pytest.fixture
@@ -28,3 +33,16 @@ async def client():
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+
+
+async def signup_and_login(client, email: str, name: str) -> str:
+    await client.post(
+        "/api/v1/auth/signup",
+        json={"email": email, "password": "StrongPass123", "name": name},
+    )
+    login = await client.post("/api/v1/auth/login", json={"email": email, "password": "StrongPass123"})
+    return login.json()["data"]["access_token"]
+
+
+def auth_headers(token: str) -> dict:
+    return {"Authorization": f"Bearer {token}"}

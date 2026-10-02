@@ -1,0 +1,11 @@
+from enum import Enum
+
+
+class PostCategory(str, Enum):
+    QUESTION = "QUESTION"
+    ANNOUNCEMENT = "ANNOUNCEMENT"
+    LOST_AND_FOUND = "LOST_AND_FOUND"
+    MEETUP = "MEETUP"
+    TRAVELER_REQUEST = "TRAVELER_REQUEST"
+    NEWS = "NEWS"
+    OTHER = "OTHER"

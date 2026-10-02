@@ -1,41 +1,58 @@
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
 import {
+  Building2,
   Car,
+  CarFront,
   Heart,
   Home,
   MessageSquare,
   Package,
   Settings,
   ShoppingBag,
+  Store,
   User,
+  Users,
   Wallet,
   Wrench,
 } from "lucide-vue-next";
 
+import AppLogo from "@/components/common/AppLogo.vue";
+import LanguageSwitcher from "@/components/common/LanguageSwitcher.vue";
+
+const { t } = useI18n();
+
 const mainLinks = [
-  { to: "/", label: "Home", icon: Home },
-  { to: "/taxi", label: "Taxi", icon: Car },
-  { to: "/delivery", label: "Delivery", icon: Package },
-  { to: "/jobs", label: "Jobs", icon: ShoppingBag },
-  { to: "/services", label: "Services", icon: Wrench },
+  { to: "/", labelKey: "nav.home", icon: Home },
+  { to: "/taxi", labelKey: "nav.taxi", icon: Car },
+  { to: "/delivery", labelKey: "nav.delivery", icon: Package },
+  { to: "/jobs", labelKey: "nav.jobs", icon: ShoppingBag },
+  { to: "/services", labelKey: "nav.services", icon: Wrench },
+  { to: "/marketplace", labelKey: "nav.marketplace", icon: Store },
+  { to: "/housing", labelKey: "nav.housing", icon: Building2 },
+  { to: "/auto", labelKey: "nav.auto", icon: CarFront },
+  { to: "/community", labelKey: "nav.community", icon: Users },
 ];
 
 const secondaryLinks = [
-  { to: "/orders", label: "Orders", icon: ShoppingBag },
-  { to: "/messages", label: "Messages", icon: MessageSquare },
-  { to: "/favorites", label: "Favorites", icon: Heart },
+  { to: "/orders", labelKey: "nav.orders", icon: ShoppingBag },
+  { to: "/messages", labelKey: "nav.messages", icon: MessageSquare },
+  { to: "/favorites", labelKey: "nav.favorites", icon: Heart },
 ];
 
 const accountLinks = [
-  { to: "/payments", label: "Payments", icon: Wallet },
-  { to: "/profile", label: "Settings", icon: Settings },
+  { to: "/payments", labelKey: "nav.payments", icon: Wallet },
+  { to: "/profile", labelKey: "nav.settings", icon: Settings },
 ];
 </script>
 
 <template>
   <aside class="flex h-full w-64 flex-col border-r border-yulda-gray-100 bg-white px-4 py-6">
-    <RouterLink to="/" class="mb-8 px-2 text-xl font-extrabold tracking-tight">YULDA</RouterLink>
+    <div class="mb-8 flex items-center justify-between px-2">
+      <RouterLink to="/"><AppLogo :size="28" /></RouterLink>
+      <LanguageSwitcher />
+    </div>
 
     <nav class="flex flex-1 flex-col gap-6">
       <div class="flex flex-col gap-1">
@@ -47,7 +64,7 @@ const accountLinks = [
           active-class="bg-yulda-yellow/15 text-yulda-black font-semibold"
         >
           <component :is="link.icon" class="h-[18px] w-[18px]" />
-          {{ link.label }}
+          {{ t(link.labelKey) }}
         </RouterLink>
       </div>
 
@@ -60,7 +77,7 @@ const accountLinks = [
           active-class="bg-yulda-yellow/15 text-yulda-black font-semibold"
         >
           <component :is="link.icon" class="h-[18px] w-[18px]" />
-          {{ link.label }}
+          {{ t(link.labelKey) }}
         </RouterLink>
       </div>
 
@@ -73,7 +90,7 @@ const accountLinks = [
           active-class="bg-yulda-yellow/15 text-yulda-black font-semibold"
         >
           <component :is="link.icon" class="h-[18px] w-[18px]" />
-          {{ link.label }}
+          {{ t(link.labelKey) }}
         </RouterLink>
       </div>
     </nav>
@@ -82,7 +99,7 @@ const accountLinks = [
       <div class="flex h-8 w-8 items-center justify-center rounded-full bg-yulda-black text-white">
         <User class="h-4 w-4" />
       </div>
-      <span class="truncate text-sm font-medium">Account</span>
+      <span class="truncate text-sm font-medium">{{ t("nav.account") }}</span>
     </RouterLink>
   </aside>
 </template>
