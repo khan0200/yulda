@@ -85,3 +85,4 @@ const accountLinks = [
       <span class="truncate text-sm font-medium">Account</span>
     </RouterLink>
   </aside>
+</template>
