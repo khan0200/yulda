@@ -96,7 +96,7 @@ async function handleSubmit() {
       <BaseTextarea v-model="form.description" :label="t('marketplace.descriptionLabel')" :placeholder="t('marketplace.descriptionPlaceholder')" :rows="6" required />
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <BaseInput v-model="form.price" type="number" :label="t('marketplace.priceLabel')" :placeholder="t('marketplace.pricePlaceholder')" required />
+        <BaseInput v-model="form.price" type="number" prefix="₩" suffix="KRW" :label="t('marketplace.priceLabel')" :placeholder="t('marketplace.pricePlaceholder')" required />
         <div>
           <label class="label">{{ t("marketplace.conditionLabel") }}</label>
           <select v-model="form.condition" class="input">

@@ -6,6 +6,7 @@ import { Car, Search } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import DatePicker from "@/components/common/DatePicker.vue";
 import DateTimePicker from "@/components/common/DateTimePicker.vue";
 import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PlaceAutocomplete from "@/components/common/PlaceAutocomplete.vue";
@@ -164,7 +165,7 @@ onMounted(() => runSearch());
           <PlaceAutocomplete v-model="searchForm.toCity" country="KR" :placeholder="t('route.toCity')" />
         </div>
         <div class="w-full sm:w-44">
-          <BaseInput v-model="searchForm.date" type="date" :label="t('route.date')" />
+          <DatePicker v-model="searchForm.date" :label="t('route.date')" />
         </div>
         <BaseButton class="sm:w-auto" :loading="store.isLoading" @click="runSearch">
           <Search class="h-4 w-4" />

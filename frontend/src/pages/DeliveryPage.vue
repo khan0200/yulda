@@ -8,6 +8,8 @@ import CargoPostCard from "@/components/cargo/CargoPostCard.vue";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import DatePicker from "@/components/common/DatePicker.vue";
+import DateTimePicker from "@/components/common/DateTimePicker.vue";
 import PlaceAutocomplete from "@/components/common/PlaceAutocomplete.vue";
 import PriceInput from "@/components/common/PriceInput.vue";
 import RouteStopsBuilder from "@/components/route/RouteStopsBuilder.vue";
@@ -34,13 +36,21 @@ async function runSearch() {
   });
 }
 
+function getTodayIsoString(): string {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+}
+
+const todayDatetime = getTodayIsoString();
+
 const postForm = reactive({
   post_type: "OFFER" as CargoPostType,
   stops: [
     { name: "", country: "KR" },
     { name: "", country: "UZ" },
   ] as RouteStop[],
-  departure_at: "",
+  departure_at: todayDatetime,
   accepted_categories: [] as CargoCategory[],
   rejected_categories: [] as CargoCategory[],
   max_weight_kg: "",
@@ -144,7 +154,7 @@ onMounted(() => runSearch());
           <PlaceAutocomplete v-model="searchForm.toCity" :placeholder="t('cargo.toCity')" />
         </div>
         <div class="w-full sm:w-44">
-          <BaseInput v-model="searchForm.date" type="date" :label="t('cargo.date')" />
+          <DatePicker v-model="searchForm.date" :label="t('cargo.date')" />
         </div>
         <BaseButton class="sm:w-auto" :loading="store.isLoading" @click="runSearch">
           <Search class="h-4 w-4" />
@@ -197,7 +207,10 @@ onMounted(() => runSearch());
           <RouteStopsBuilder v-model="postForm.stops" />
         </div>
 
-        <BaseInput v-model="postForm.departure_at" type="datetime-local" :label="t('cargo.departureLabel')" required />
+        <div>
+          <label class="label">{{ t('cargo.departureLabel') }} <span class="text-yulda-gold">*</span></label>
+          <DateTimePicker v-model="postForm.departure_at" :min="todayDatetime" />
+        </div>
 
         <CargoCategoryPicker v-model="postForm.accepted_categories" :label="t('cargo.acceptedCategories')" />
         <CargoCategoryPicker v-model="postForm.rejected_categories" :label="t('cargo.rejectedCategories')" />

@@ -1,9 +1,29 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { ChevronLeft, ChevronRight, Calendar, Clock } from "lucide-vue-next";
 
 const props = defineProps<{ modelValue: string; min?: string }>();
 const emit = defineEmits<{ "update:modelValue": [v: string] }>();
+
+const { locale } = useI18n();
+
+const MONTHS_MAP: Record<string, string[]> = {
+  uz: ["Yanvar", "Fevral", "Mart", "Aprel", "May", "Iyun", "Iyul", "Avgust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"],
+  ru: ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"],
+  ko: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
+  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+};
+
+const DAYS_MAP: Record<string, string[]> = {
+  uz: ["Du", "Se", "Ch", "Pa", "Ju", "Sh", "Ya"],
+  ru: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
+  ko: ["월", "화", "수", "목", "금", "토", "일"],
+  en: ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+};
+
+const currentMonths = computed(() => MONTHS_MAP[locale.value] || MONTHS_MAP.uz);
+const currentDays = computed(() => DAYS_MAP[locale.value] || DAYS_MAP.uz);
 
 // ── Parse incoming value ────────────────────────────────────────────────────
 function parseValue(val: string) {
@@ -46,10 +66,6 @@ function isPast(y: number, m: number, d: number) {
   const b = mn.getFullYear() * 10000 + mn.getMonth() * 100 + mn.getDate();
   return a < b;
 }
-
-// ── Calendar grid ───────────────────────────────────────────────────────────
-const MONTHS = ["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentyabr","Oktyabr","Noyabr","Dekabr"];
-const DAYS   = ["Du","Se","Ch","Pa","Ju","Sh","Ya"];
 
 const calDays = computed(() => {
   const first = new Date(calYear.value, calMonth.value, 1);
@@ -132,7 +148,7 @@ const dateLabel = computed(() =>
             <button type="button" class="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-yulda-gray-100" @click="prevMonth">
               <ChevronLeft class="h-4 w-4" />
             </button>
-            <span class="text-sm font-bold text-yulda-black">{{ MONTHS[calMonth] }} {{ calYear }}</span>
+            <span class="text-sm font-bold text-yulda-black">{{ currentMonths[calMonth] }} {{ calYear }}</span>
             <button type="button" class="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-yulda-gray-100" @click="nextMonth">
               <ChevronRight class="h-4 w-4" />
             </button>
@@ -140,7 +156,7 @@ const dateLabel = computed(() =>
 
           <!-- Day headers -->
           <div class="mb-1 grid grid-cols-7 text-center">
-            <span v-for="d in DAYS" :key="d" class="py-1 text-xs font-semibold text-yulda-gray-400">{{ d }}</span>
+            <span v-for="d in currentDays" :key="d" class="py-1 text-xs font-semibold text-yulda-gray-400">{{ d }}</span>
           </div>
 
           <!-- Day cells -->

@@ -120,11 +120,13 @@ async function handleSubmit() {
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <BaseInput v-model="form.price" type="number" :label="t('auto.price')" required />
+        <BaseInput v-model="form.price" type="number" prefix="₩" suffix="KRW" :label="t('auto.price')" required />
         <BaseInput
           v-if="form.listing_type === 'RENTAL'"
           v-model="form.rental_price_per_day"
           type="number"
+          prefix="₩"
+          suffix="KRW"
           :label="t('auto.rentalPricePerDay')"
         />
       </div>

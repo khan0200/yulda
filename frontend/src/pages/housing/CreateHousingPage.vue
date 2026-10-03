@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import DatePicker from "@/components/common/DatePicker.vue";
 import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PhotoUploader from "@/components/common/PhotoUploader.vue";
 import { useHousingStore } from "@/stores/housingStore";
@@ -111,15 +112,15 @@ async function handleSubmit() {
       <BaseTextarea v-model="form.description" :label="t('housing.descriptionLabel')" :placeholder="t('housing.descriptionPlaceholder')" :rows="6" required />
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <BaseInput v-model="form.deposit" type="number" :label="t('housing.deposit')" required />
-        <BaseInput v-model="form.monthly_rent" type="number" :label="t('housing.monthlyRent')" required />
-        <BaseInput v-model="form.maintenance_fee" type="number" :label="t('housing.maintenanceFee')" />
+        <BaseInput v-model="form.deposit" type="number" prefix="₩" suffix="KRW" :label="t('housing.deposit')" required />
+        <BaseInput v-model="form.monthly_rent" type="number" prefix="₩" suffix="KRW" :label="t('housing.monthlyRent')" required />
+        <BaseInput v-model="form.maintenance_fee" type="number" prefix="₩" suffix="KRW" :label="t('housing.maintenanceFee')" />
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <BaseInput v-model="form.city" :label="t('housing.city')" />
         <BaseInput v-model="form.metro_station" :label="t('housing.metroStation')" />
-        <BaseInput v-model="form.move_in_date" type="date" :label="t('housing.moveInDate')" />
+        <DatePicker v-model="form.move_in_date" :label="t('housing.moveInDate')" />
       </div>
 
       <!-- Interactive Map for pinpointing apartment location -->
