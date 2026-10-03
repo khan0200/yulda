@@ -22,6 +22,12 @@ const store = useRouteStore();
 
 const activeTab = ref<"search" | "post">("search");
 
+// YYYY-MM-DD  /  YYYY-MM-DDTHH:MM  helpers
+function pad(n: number) { return String(n).padStart(2, "0"); }
+const _now = new Date();
+const todayDate = `${_now.getFullYear()}-${pad(_now.getMonth() + 1)}-${pad(_now.getDate())}`;
+const todayDatetime = `${todayDate}T${pad(_now.getHours())}:${pad(_now.getMinutes())}`;
+
 const searchForm = reactive({ fromCity: "", toCity: "", date: "" });
 const hasSearched = ref(false);
 
@@ -51,7 +57,7 @@ const postForm = reactive({
     { name: "", country: "KR" },
     { name: "", country: "KR" },
   ] as RouteStop[],
-  departure_at: "",
+  departure_at: todayDatetime,
   vehicle_info: "",
   seats: "",
   has_cargo_space: false,
@@ -223,7 +229,7 @@ onMounted(() => runSearch());
           </div>
         </div>
 
-        <BaseInput v-model="postForm.departure_at" type="datetime-local" :label="t('route.departureLabel')" required />
+        <BaseInput v-model="postForm.departure_at" type="datetime-local" :min="todayDatetime" :label="t('route.departureLabel')" required />
 
         <div v-if="postForm.post_type === 'OFFER'" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <BaseInput v-model="postForm.vehicle_info" :label="t('route.vehicleInfo')" :placeholder="t('route.vehicleInfoPlaceholder')" />

@@ -20,12 +20,14 @@ withDefaults(
 );
 
 defineEmits<{ "update:modelValue": [value: string] }>();
+defineOptions({ inheritAttrs: false });
 </script>
 
 <template>
   <div>
     <label v-if="label" class="label">{{ label }}<span v-if="required" class="text-yulda-gold"> *</span></label>
     <input
+      v-bind="$attrs"
       :type="type"
       :value="modelValue"
       :placeholder="placeholder"
