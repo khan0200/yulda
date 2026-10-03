@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-const emit = defineEmits<{ verified: [token: string]; expired: [] }>();
+const emit = defineEmits<{ verified: [token: string]; expired: []; error: [err: unknown] }>();
 
 const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
 const containerEl = ref<HTMLElement | null>(null);
@@ -51,6 +51,10 @@ onMounted(async () => {
     sitekey: siteKey,
     callback: (token: string) => emit("verified", token),
     "expired-callback": () => emit("expired"),
+    "error-callback": (err: unknown) => {
+      console.warn("Turnstile notice:", err);
+      emit("error", err);
+    },
   });
 });
 
@@ -62,5 +66,5 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div v-if="siteKey" ref="containerEl" />
+  <div v-if="siteKey" ref="containerEl" class="my-2 flex justify-center min-h-[65px]" />
 </template>
