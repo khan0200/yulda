@@ -51,24 +51,24 @@ const isLocating = ref(false);
 const selectedAddress = ref<string>("");
 const routeInfo = ref<{ distanceKm: number; durationMin: number } | null>(null);
 
-// OpenStreetMap standard style (100% free, no API key, no watermark)
+// ESRI World Street Map style (Bilingual: English / Latin + Korean Hangul, 100% free, no watermark)
 const MAP_STYLE: StyleSpecification = {
   version: 8,
   sources: {
-    "osm-tiles": {
+    "esri-street-tiles": {
       type: "raster",
       tiles: [
-        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
       ],
       tileSize: 256,
-      attribution: "© OpenStreetMap contributors",
+      attribution: "© Esri, HERE, Garmin, OpenStreetMap contributors",
     },
   },
   layers: [
     {
-      id: "osm-tiles-layer",
+      id: "esri-street-layer",
       type: "raster",
-      source: "osm-tiles",
+      source: "esri-street-tiles",
       minzoom: 0,
       maxzoom: 19,
     },

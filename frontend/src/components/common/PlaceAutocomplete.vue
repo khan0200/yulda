@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import { onClickOutside, useDebounceFn } from "@vueuse/core";
 import { Check, Loader2, Map, MapPin, X } from "lucide-vue-next";
 
@@ -37,13 +37,34 @@ const hasSelected = ref(false);
 
 const isMapModalOpen = ref(false);
 const pendingMapPlace = ref<{ name: string; lat?: number; lon?: number } | null>(null);
+const initialMapCoords = ref<Coordinates | undefined>(undefined);
 
-const initialMapCoords = computed<Coordinates | undefined>(() => {
-  if (query.value) {
-    return getCityCoordinates(query.value) ?? undefined;
+const POPULAR_SHORTCUTS = [
+  { name: "Seoul", label: "Seul / 서울" },
+  { name: "Incheon", label: "Incheon / 인천" },
+  { name: "Ansan", label: "Ansan / 안산" },
+  { name: "Suwon", label: "Suvon / 수원" },
+  { name: "Pyeongtaek", label: "Pxyontek / 평택" },
+  { name: "Cheonan", label: "Chonan / 천안" },
+  { name: "Cheongju", label: "Chongju / 청주" },
+  { name: "Daegu", label: "Tegu / 대구" },
+  { name: "Busan", label: "Pusan / 부산" },
+  { name: "Gimhae", label: "Kimxe / 김해" },
+  { name: "Toshkent", label: "Toshkent" },
+  { name: "Samarqand", label: "Samarqand" },
+];
+
+function jumpToCity(cityName: string) {
+  const c = getCityCoordinates(cityName);
+  if (c) {
+    initialMapCoords.value = { ...c };
+    pendingMapPlace.value = {
+      name: cityName,
+      lat: c.lat,
+      lon: c.lon,
+    };
   }
-  return undefined;
-});
+}
 
 watch(
   () => props.modelValue,
@@ -242,7 +263,20 @@ onClickOutside(rootEl, () => {
           </div>
 
           <!-- Modal Map View -->
-          <div class="p-4">
+          <div class="p-4 flex flex-col gap-2.5">
+            <!-- Quick City Shortcut Chips -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+              <span class="text-[11px] font-bold text-yulda-gray-400 uppercase tracking-wider whitespace-nowrap mr-0.5">Tezkor:</span>
+              <button
+                v-for="c in POPULAR_SHORTCUTS"
+                :key="c.name"
+                type="button"
+                class="rounded-full bg-yulda-gray-100 px-2.5 py-1 text-xs font-semibold text-yulda-gray-700 whitespace-nowrap hover:bg-yulda-black hover:text-white transition-all flex-shrink-0"
+                @click="jumpToCity(c.name)"
+              >
+                {{ c.label }}
+              </button>
+            </div>
             <InteractiveMap
               mode="picker"
               :initial-location="initialMapCoords"
