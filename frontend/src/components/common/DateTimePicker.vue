@@ -99,9 +99,6 @@ watch(() => props.modelValue, (val) => {
 const dateLabel = computed(() =>
   `${selYear.value}-${pad(selMonth.value + 1)}-${pad(selDay.value)}`
 );
-const timeLabel = computed(() =>
-  `${pad(selHour.value)}:${pad(selMin.value)}`
-);
 </script>
 
 <template>

@@ -276,39 +276,46 @@ function drawDashedLine() {
     return { x: p.x, y: p.y };
   });
 
-  const MARKER_RADIUS = 18;
-
-  // Offset only the very first and very last point away from marker centers
-  const pts = pixels.map((p) => ({ ...p }));
-  if (pts.length >= 2) {
-    const dx0 = pts[1].x - pts[0].x;
-    const dy0 = pts[1].y - pts[0].y;
-    const len0 = Math.sqrt(dx0 * dx0 + dy0 * dy0) || 1;
-    pts[0] = { x: pts[0].x + (dx0 / len0) * MARKER_RADIUS, y: pts[0].y + (dy0 / len0) * MARKER_RADIUS };
-
-    const last = pts.length - 1;
-    const dx1 = pts[last - 1].x - pts[last].x;
-    const dy1 = pts[last - 1].y - pts[last].y;
-    const len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1) || 1;
-    pts[last] = { x: pts[last].x + (dx1 / len1) * MARKER_RADIUS, y: pts[last].y + (dy1 / len1) * MARKER_RADIUS };
-  }
-
-  // Build control points for each segment (10% perpendicular curve)
-  function segmentCP(a: {x:number;y:number}, b: {x:number;y:number}) {
-    const mx = (a.x + b.x) / 2;
-    const my = (a.y + b.y) / 2;
-    const dx = b.x - a.x;
-    const dy = b.y - a.y;
-    const len = Math.sqrt(dx * dx + dy * dy) || 1;
-    const offset = len * 0.10;
-    return { cx: mx + (dy / len) * offset, cy: my - (dx / len) * offset };
-  }
+  const A_B_RADIUS = 18; // Radius for start (A) and end (B) markers
+  const WP_RADIUS = 16;  // Radius for intermediate waypoint markers (1, 2, ...)
 
   function drawAllSegments() {
-    for (let i = 0; i < pts.length - 1; i++) {
-      const { cx, cy } = segmentCP(pts[i], pts[i + 1]);
-      ctx!.moveTo(pts[i].x, pts[i].y);
-      ctx!.quadraticCurveTo(cx, cy, pts[i + 1].x, pts[i + 1].y);
+    for (let i = 0; i < pixels.length - 1; i++) {
+      const p0 = pixels[i];
+      const p1 = pixels[i + 1];
+
+      const r0 = i === 0 ? A_B_RADIUS : WP_RADIUS;
+      const r1 = i + 1 === pixels.length - 1 ? A_B_RADIUS : WP_RADIUS;
+
+      const dx = p1.x - p0.x;
+      const dy = p1.y - p0.y;
+      const totalLen = Math.sqrt(dx * dx + dy * dy) || 1;
+
+      if (totalLen <= r0 + r1) continue;
+
+      // 10% perpendicular curve control point
+      const mx = (p0.x + p1.x) / 2;
+      const my = (p0.y + p1.y) / 2;
+      const offset = totalLen * 0.10;
+      const cx = mx + (dy / totalLen) * offset;
+      const cy = my - (dx / totalLen) * offset;
+
+      // Start point at edge of marker p0 along tangent to (cx, cy)
+      const v0x = cx - p0.x;
+      const v0y = cy - p0.y;
+      const len0 = Math.sqrt(v0x * v0x + v0y * v0y) || 1;
+      const sx = p0.x + (v0x / len0) * r0;
+      const sy = p0.y + (v0y / len0) * r0;
+
+      // End point at edge of marker p1 along tangent from (cx, cy)
+      const v1x = cx - p1.x;
+      const v1y = cy - p1.y;
+      const len1 = Math.sqrt(v1x * v1x + v1y * v1y) || 1;
+      const ex = p1.x + (v1x / len1) * r1;
+      const ey = p1.y + (v1y / len1) * r1;
+
+      ctx!.moveTo(sx, sy);
+      ctx!.quadraticCurveTo(cx, cy, ex, ey);
     }
   }
 
