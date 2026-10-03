@@ -25,6 +25,7 @@ export interface CommunityPost {
   location: GeoPoint | null;
   author: AuthorSummary;
   comment_count: number;
+  like_count: number;
   created_at: string;
   updated_at: string;
 }

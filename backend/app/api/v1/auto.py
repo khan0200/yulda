@@ -3,7 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.api.deps import get_current_user, get_db
 from app.core.responses import ApiResponse, PaginatedData
-from app.models.auto import AutoListingType, FuelType, TransmissionType
+from app.models.auto import AccidentHistory, AutoListingType, BodyType, FuelType, TransmissionType
 from app.schemas.auto import AutoListingCreate, AutoListingPublic, AutoListingUpdate
 from app.services.auto_service import AutoService
 
@@ -25,6 +25,11 @@ async def list_listings(
     max_year: int | None = Query(default=None, ge=1980, le=2100),
     min_price: int | None = Query(default=None, ge=0),
     max_price: int | None = Query(default=None, ge=0),
+    min_mileage: int | None = Query(default=None, ge=0),
+    max_mileage: int | None = Query(default=None, ge=0),
+    body_type: BodyType | None = None,
+    color: str | None = None,
+    accident_history: AccidentHistory | None = None,
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=50),
     service: AutoService = Depends(get_auto_service),
@@ -39,6 +44,11 @@ async def list_listings(
         max_year=max_year,
         min_price=min_price,
         max_price=max_price,
+        min_mileage=min_mileage,
+        max_mileage=max_mileage,
+        body_type=body_type.value if body_type else None,
+        color=color,
+        accident_history=accident_history.value if accident_history else None,
         page=page,
         page_size=page_size,
     )

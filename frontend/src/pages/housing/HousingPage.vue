@@ -4,18 +4,27 @@ import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
 import { Plus } from "lucide-vue-next";
 
+import MultiSelectDropdown from "@/components/common/MultiSelectDropdown.vue";
 import NeighborhoodBar from "@/components/common/NeighborhoodBar.vue";
 import HousingCard from "@/components/housing/HousingCard.vue";
 import { useHousingStore } from "@/stores/housingStore";
 import { useUserLocationStore } from "@/stores/userLocationStore";
-import type { HousingType } from "@/types/housing";
+import type { HousingAmenity, HousingType } from "@/types/housing";
 
 const { t } = useI18n();
 const store = useHousingStore();
 const locationStore = useUserLocationStore();
 
 const types: HousingType[] = ["ONE_ROOM", "TWO_ROOM", "ROOMMATE", "APARTMENT", "COMMERCIAL"];
+const amenitiesList: HousingAmenity[] = [
+  "FRIDGE", "WASHER", "AC", "PARKING", "TV", "WARDROBE", "BED", "DESK",
+  "SHOE_CABINET", "INDUCTION", "GAS_RANGE", "MICROWAVE", "ELEVATOR",
+  "DIGITAL_LOCK", "CCTV", "BALCONY", "VERANDA_EXPANSION", "INTERNET",
+  "PET_FRIENDLY", "HEATING_FLOOR",
+];
+const amenityOptions = computed(() => amenitiesList.map((a) => ({ value: a, label: t(`housing.amenity.${a}`) })));
 const activeType = ref<HousingType | null>(null);
+const selectedAmenities = ref<string[]>([]);
 const filters = reactive({ minDeposit: "", maxDeposit: "", minRent: "", maxRent: "", city: "" });
 const page = ref(1);
 
@@ -36,12 +45,18 @@ async function loadListings(reset = true) {
       max_deposit: filters.maxDeposit ? Number(filters.maxDeposit) : undefined,
       min_rent: filters.minRent ? Number(filters.minRent) : undefined,
       max_rent: filters.maxRent ? Number(filters.maxRent) : undefined,
+      amenities: selectedAmenities.value.length ? (selectedAmenities.value as HousingAmenity[]) : undefined,
       city: filters.city || undefined,
       page: page.value,
       page_size: 24,
     },
     !reset,
   );
+}
+
+function updateAmenities(next: string[]) {
+  selectedAmenities.value = next;
+  loadListings(true);
 }
 
 function selectType(type: HousingType | null) {
@@ -73,23 +88,33 @@ onMounted(() => loadListings(true));
     <!-- Daangn-style Neighborhood bar for local-first listings -->
     <NeighborhoodBar class="mt-6" />
 
-    <div class="mt-6 flex flex-wrap gap-2">
-      <button
-        class="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
-        :class="activeType === null ? 'bg-yulda-black text-white' : 'bg-yulda-gray-100 text-yulda-gray-600 hover:bg-yulda-gray-200'"
-        @click="selectType(null)"
-      >
-        {{ t("housing.allTypes") }}
-      </button>
-      <button
-        v-for="type in types"
-        :key="type"
-        class="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
-        :class="activeType === type ? 'bg-yulda-black text-white' : 'bg-yulda-gray-100 text-yulda-gray-600 hover:bg-yulda-gray-200'"
-        @click="selectType(type)"
-      >
-        {{ t(`housing.type.${type}`) }}
-      </button>
+    <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap gap-2">
+        <button
+          class="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+          :class="activeType === null ? 'bg-yulda-black text-white' : 'bg-yulda-gray-100 text-yulda-gray-600 hover:bg-yulda-gray-200'"
+          @click="selectType(null)"
+        >
+          {{ t("housing.allTypes") }}
+        </button>
+        <button
+          v-for="type in types"
+          :key="type"
+          class="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+          :class="activeType === type ? 'bg-yulda-black text-white' : 'bg-yulda-gray-100 text-yulda-gray-600 hover:bg-yulda-gray-200'"
+          @click="selectType(type)"
+        >
+          {{ t(`housing.type.${type}`) }}
+        </button>
+      </div>
+
+      <input
+        v-model="filters.city"
+        type="text"
+        :placeholder="t('housing.city')"
+        class="input w-40"
+        @change="loadListings(true)"
+      />
     </div>
 
     <div class="mt-4 flex flex-wrap items-end gap-3 rounded-2xl border border-yulda-gray-100 bg-yulda-gray-50 p-4">
@@ -110,8 +135,14 @@ onMounted(() => loadListings(true));
         <input v-model="filters.maxRent" type="number" class="input w-32" @change="loadListings(true)" />
       </div>
       <div>
-        <label class="label">{{ t("housing.city") }}</label>
-        <input v-model="filters.city" type="text" class="input w-40" @change="loadListings(true)" />
+        <label class="label">{{ t("housing.amenitiesFilter") }}</label>
+        <MultiSelectDropdown
+          :model-value="selectedAmenities"
+          :options="amenityOptions"
+          :label="t('housing.amenitiesFilter')"
+          :clear-label="t('housing.clearAmenities')"
+          @update:model-value="updateAmenities"
+        />
       </div>
     </div>
 

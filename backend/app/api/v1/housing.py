@@ -3,7 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.api.deps import get_current_user, get_db
 from app.core.responses import ApiResponse, PaginatedData
-from app.models.housing import HousingType
+from app.models.housing import HousingAmenity, HousingType
 from app.schemas.housing import HousingCreate, HousingPublic, HousingUpdate
 from app.services.housing_service import HousingService
 
@@ -22,6 +22,7 @@ async def list_listings(
     max_deposit: int | None = Query(default=None, ge=0),
     min_rent: int | None = Query(default=None, ge=0),
     max_rent: int | None = Query(default=None, ge=0),
+    amenities: list[HousingAmenity] | None = Query(default=None),
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=50),
     service: HousingService = Depends(get_housing_service),
@@ -33,6 +34,7 @@ async def list_listings(
         max_deposit=max_deposit,
         min_rent=min_rent,
         max_rent=max_rent,
+        amenities=[a.value for a in amenities] if amenities else None,
         page=page,
         page_size=page_size,
     )

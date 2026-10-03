@@ -47,3 +47,4 @@ class ListingPublic(BaseModel):
     seller: OwnerSummary
     created_at: datetime
     updated_at: datetime
+    like_count: int = 0

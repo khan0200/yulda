@@ -43,6 +43,7 @@ class PostPublic(BaseModel):
     location: GeoPoint | None = None
     author: AuthorSummary
     comment_count: int = 0
+    like_count: int = 0
     created_at: datetime
     updated_at: datetime
 

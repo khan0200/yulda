@@ -24,3 +24,21 @@ class AutoListingStatus(str, Enum):
     RESERVED = "RESERVED"
     SOLD = "SOLD"
     UNAVAILABLE = "UNAVAILABLE"
+
+
+class BodyType(str, Enum):
+    SEDAN = "SEDAN"
+    SUV = "SUV"
+    HATCHBACK = "HATCHBACK"
+    WAGON = "WAGON"
+    MINIVAN = "MINIVAN"
+    PICKUP = "PICKUP"
+    COUPE = "COUPE"
+    CONVERTIBLE = "CONVERTIBLE"
+    VAN = "VAN"
+
+
+class AccidentHistory(str, Enum):
+    NONE = "NONE"
+    MINOR = "MINOR"
+    MAJOR = "MAJOR"

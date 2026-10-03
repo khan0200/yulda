@@ -20,6 +20,8 @@ class HousingService:
         if doc.get("move_in_date"):
             doc["move_in_date"] = datetime.combine(payload.move_in_date, time.min)
         doc["amenities"] = [a.value for a in payload.amenities]
+        if payload.direction is not None:
+            doc["direction"] = payload.direction.value
         doc["owner_id"] = owner["_id"]
         doc["owner"] = owner_summary(owner)
         return await self._repo.create(doc)
@@ -38,6 +40,7 @@ class HousingService:
         max_deposit: int | None,
         min_rent: int | None,
         max_rent: int | None,
+        amenities: list[str] | None,
         page: int,
         page_size: int,
     ) -> tuple[list[dict[str, Any]], int]:
@@ -48,6 +51,7 @@ class HousingService:
             max_deposit=max_deposit,
             min_rent=min_rent,
             max_rent=max_rent,
+            amenities=amenities,
             page=page,
             page_size=page_size,
         )
@@ -58,6 +62,8 @@ class HousingService:
         updates = {k: v for k, v in payload.model_dump(exclude_unset=True).items() if v is not None}
         if "amenities" in updates:
             updates["amenities"] = [a.value if hasattr(a, "value") else a for a in updates["amenities"]]
+        if "direction" in updates and hasattr(updates["direction"], "value"):
+            updates["direction"] = updates["direction"].value
         updated = await self._repo.update(listing["_id"], updates)
         assert updated is not None
         return updated

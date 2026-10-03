@@ -200,7 +200,7 @@ async def _create_indexes(db: AsyncIOMotorDatabase) -> None:
     await db.reviews.create_index("target_id")
     await db.reviews.create_index("author_id")
 
-    await db.favorites.create_index([("user_id", 1), ("target_id", 1)], unique=True)
+    await db.favorites.create_index([("user_id", 1), ("target_type", 1), ("target_id", 1)], unique=True)
 
     await db.reports.create_index("status")
     await db.admin_logs.create_index("created_at")
@@ -252,6 +252,24 @@ async def _create_indexes(db: AsyncIOMotorDatabase) -> None:
     await db.auto_listings.create_index("owner_id")
     await db.auto_listings.create_index("created_at")
     await db.auto_listings.create_index([("location", "2dsphere")], sparse=True)
+
+    await db.job_posts.create_index("post_type")
+    await db.job_posts.create_index("category")
+    await db.job_posts.create_index("employment_type")
+    await db.job_posts.create_index("city")
+    await db.job_posts.create_index("status")
+    await db.job_posts.create_index("owner_id")
+    await db.job_posts.create_index("created_at")
+    await db.job_posts.create_index([("title", "text"), ("description", "text")])
+    await db.job_posts.create_index([("location", "2dsphere")], sparse=True)
+
+    await db.service_posts.create_index("category")
+    await db.service_posts.create_index("city")
+    await db.service_posts.create_index("status")
+    await db.service_posts.create_index("owner_id")
+    await db.service_posts.create_index("created_at")
+    await db.service_posts.create_index([("title", "text"), ("description", "text")])
+    await db.service_posts.create_index([("location", "2dsphere")], sparse=True)
 
     await db.route_posts.create_index("post_type")
     await db.route_posts.create_index("status")

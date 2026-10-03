@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
+import { useDebounceFn } from "@vueuse/core";
 import { Plus } from "lucide-vue-next";
 
 import AutoCard from "@/components/auto/AutoCard.vue";
 import NeighborhoodBar from "@/components/common/NeighborhoodBar.vue";
+import SimpleAutocomplete from "@/components/common/SimpleAutocomplete.vue";
+import { VEHICLE_MAKES } from "@/data/vehicleCatalog";
 import { useAutoStore } from "@/stores/autoStore";
 import { useUserLocationStore } from "@/stores/userLocationStore";
-import type { AutoListingType, FuelType, TransmissionType } from "@/types/auto";
+import type { AccidentHistory, AutoListingType, BodyType, FuelType, TransmissionType } from "@/types/auto";
 
 const { t } = useI18n();
 const store = useAutoStore();
@@ -17,6 +20,8 @@ const locationStore = useUserLocationStore();
 const listingTypes: AutoListingType[] = ["SALE", "RENTAL"];
 const fuelTypes: FuelType[] = ["GASOLINE", "DIESEL", "LPG", "HYBRID", "ELECTRIC"];
 const transmissions: TransmissionType[] = ["AUTOMATIC", "MANUAL"];
+const bodyTypes: BodyType[] = ["SEDAN", "SUV", "HATCHBACK", "WAGON", "MINIVAN", "PICKUP", "COUPE", "CONVERTIBLE", "VAN"];
+const accidentHistories: AccidentHistory[] = ["NONE", "MINOR", "MAJOR"];
 
 const activeListingType = ref<AutoListingType | null>(null);
 const filters = reactive({
@@ -27,6 +32,11 @@ const filters = reactive({
   maxYear: "",
   minPrice: "",
   maxPrice: "",
+  minMileage: "",
+  maxMileage: "",
+  bodyType: "",
+  color: "",
+  accidentHistory: "",
   city: "",
 });
 const page = ref(1);
@@ -51,6 +61,11 @@ async function loadListings(reset = true) {
       max_year: filters.maxYear ? Number(filters.maxYear) : undefined,
       min_price: filters.minPrice ? Number(filters.minPrice) : undefined,
       max_price: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+      min_mileage: filters.minMileage ? Number(filters.minMileage) : undefined,
+      max_mileage: filters.maxMileage ? Number(filters.maxMileage) : undefined,
+      body_type: (filters.bodyType as BodyType) || undefined,
+      color: filters.color || undefined,
+      accident_history: (filters.accidentHistory as AccidentHistory) || undefined,
       city: filters.city || undefined,
       page: page.value,
       page_size: 24,
@@ -58,6 +73,9 @@ async function loadListings(reset = true) {
     !reset,
   );
 }
+
+const debouncedSearch = useDebounceFn(() => loadListings(true), 350);
+watch(() => filters.make, debouncedSearch);
 
 function selectListingType(type: AutoListingType | null) {
   activeListingType.value = type;
@@ -108,9 +126,9 @@ onMounted(() => loadListings(true));
     </div>
 
     <div class="mt-4 flex flex-wrap items-end gap-3 rounded-2xl border border-yulda-gray-100 bg-yulda-gray-50 p-4">
-      <div>
+      <div class="w-36">
         <label class="label">{{ t("auto.make") }}</label>
-        <input v-model="filters.make" type="text" class="input w-36" @change="loadListings(true)" />
+        <SimpleAutocomplete v-model="filters.make" :options="VEHICLE_MAKES" placeholder="Hyundai" />
       </div>
       <div>
         <label class="label">{{ t("auto.fuelType.GASOLINE") }}</label>
@@ -141,6 +159,32 @@ onMounted(() => loadListings(true));
       <div>
         <label class="label">{{ t("auto.maxPrice") }}</label>
         <input v-model="filters.maxPrice" type="number" class="input w-32" @change="loadListings(true)" />
+      </div>
+      <div>
+        <label class="label">{{ t("auto.minMileage") }}</label>
+        <input v-model="filters.minMileage" type="number" class="input w-28" @change="loadListings(true)" />
+      </div>
+      <div>
+        <label class="label">{{ t("auto.maxMileage") }}</label>
+        <input v-model="filters.maxMileage" type="number" class="input w-28" @change="loadListings(true)" />
+      </div>
+      <div>
+        <label class="label">{{ t("auto.bodyType.label") }}</label>
+        <select v-model="filters.bodyType" class="input w-36" @change="loadListings(true)">
+          <option value="">{{ t("auto.bodyType.all") }}</option>
+          <option v-for="bt in bodyTypes" :key="bt" :value="bt">{{ t(`auto.bodyType.${bt}`) }}</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">{{ t("auto.color") }}</label>
+        <input v-model="filters.color" type="text" class="input w-28" :placeholder="t('auto.colorPlaceholder')" @change="loadListings(true)" />
+      </div>
+      <div>
+        <label class="label">{{ t("auto.accidentHistory.label") }}</label>
+        <select v-model="filters.accidentHistory" class="input w-40" @change="loadListings(true)">
+          <option value="">{{ t("auto.accidentHistory.all") }}</option>
+          <option v-for="ah in accidentHistories" :key="ah" :value="ah">{{ t(`auto.accidentHistory.${ah}`) }}</option>
+        </select>
       </div>
       <div>
         <label class="label">{{ t("auto.city") }}</label>

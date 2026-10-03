@@ -117,6 +117,37 @@ onMounted(() => store.fetchListing(listingId.value));
             </div>
           </div>
 
+          <div
+            v-if="store.currentListing.body_type || store.currentListing.color || store.currentListing.accident_history || store.currentListing.owner_count"
+            class="mt-3 grid grid-cols-2 gap-3 rounded-xl bg-yulda-gray-50 p-4 text-center sm:grid-cols-4"
+          >
+            <div v-if="store.currentListing.body_type">
+              <p class="text-xs text-yulda-gray-400">{{ t("auto.bodyType.label") }}</p>
+              <p class="mt-1 text-sm font-bold text-yulda-black">{{ t(`auto.bodyType.${store.currentListing.body_type}`) }}</p>
+            </div>
+            <div v-if="store.currentListing.color">
+              <p class="text-xs text-yulda-gray-400">{{ t("auto.color") }}</p>
+              <p class="mt-1 text-sm font-bold text-yulda-black">{{ store.currentListing.color }}</p>
+            </div>
+            <div v-if="store.currentListing.accident_history">
+              <p class="text-xs text-yulda-gray-400">{{ t("auto.accidentHistory.label") }}</p>
+              <p class="mt-1 text-sm font-bold" :class="store.currentListing.accident_history === 'NONE' ? 'text-emerald-600' : 'text-yulda-black'">
+                {{ t(`auto.accidentHistory.${store.currentListing.accident_history}`) }}
+              </p>
+            </div>
+            <div v-if="store.currentListing.owner_count">
+              <p class="text-xs text-yulda-gray-400">{{ t("auto.ownerCount") }}</p>
+              <p class="mt-1 text-sm font-bold text-yulda-black">{{ store.currentListing.owner_count }}</p>
+            </div>
+          </div>
+
+          <span
+            v-if="store.currentListing.credit_available"
+            class="mt-3 inline-block rounded-full bg-yulda-yellow/15 px-3 py-1 text-xs font-semibold text-yulda-black"
+          >
+            {{ t("auto.creditAvailable") }}
+          </span>
+
           <p class="mt-4 whitespace-pre-wrap text-sm text-yulda-gray-700">{{ store.currentListing.description }}</p>
 
           <div class="mt-6 flex items-center gap-2 border-t border-yulda-gray-100 pt-4 text-sm text-yulda-gray-500">

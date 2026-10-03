@@ -37,6 +37,11 @@ class AutoService:
         max_year: int | None,
         min_price: int | None,
         max_price: int | None,
+        min_mileage: int | None,
+        max_mileage: int | None,
+        body_type: str | None,
+        color: str | None,
+        accident_history: str | None,
         page: int,
         page_size: int,
     ) -> tuple[list[dict[str, Any]], int]:
@@ -50,6 +55,11 @@ class AutoService:
             max_year=max_year,
             min_price=min_price,
             max_price=max_price,
+            min_mileage=min_mileage,
+            max_mileage=max_mileage,
+            body_type=body_type,
+            color=color,
+            accident_history=accident_history,
             page=page,
             page_size=page_size,
         )

@@ -47,15 +47,25 @@ const router = createRouter({
     {
       path: "/jobs",
       name: "jobs",
-      component: () => import("@/pages/PlaceholderPage.vue"),
-      props: { titleKey: "home.jobsTitle", subtitleKey: "home.jobsDesc" },
+      component: () => import("@/pages/jobs/JobsPage.vue"),
+      meta: { layout: "public" },
+    },
+    {
+      path: "/jobs/:id",
+      name: "job-detail",
+      component: () => import("@/pages/jobs/JobDetailPage.vue"),
       meta: { layout: "public" },
     },
     {
       path: "/services",
       name: "services",
-      component: () => import("@/pages/PlaceholderPage.vue"),
-      props: { titleKey: "home.servicesTitle", subtitleKey: "home.servicesDesc" },
+      component: () => import("@/pages/services/ServicesPage.vue"),
+      meta: { layout: "public" },
+    },
+    {
+      path: "/services/:id",
+      name: "service-detail",
+      component: () => import("@/pages/services/ServiceDetailPage.vue"),
       meta: { layout: "public" },
     },
     {

@@ -1,6 +1,6 @@
 import { http } from "@/services/http";
 import type { ApiResponse, PaginatedData } from "@/types/api";
-import type { AutoListing, AutoListingType, FuelType, TransmissionType } from "@/types/auto";
+import type { AccidentHistory, AutoListing, AutoListingType, BodyType, FuelType, TransmissionType } from "@/types/auto";
 
 export interface ListAutoParams {
   listing_type?: AutoListingType;
@@ -12,6 +12,11 @@ export interface ListAutoParams {
   max_year?: number;
   min_price?: number;
   max_price?: number;
+  min_mileage?: number;
+  max_mileage?: number;
+  body_type?: BodyType;
+  color?: string;
+  accident_history?: AccidentHistory;
   page?: number;
   page_size?: number;
 }
@@ -31,6 +36,11 @@ export interface CreateAutoListingPayload {
   city?: string;
   location?: import("@/types/user").GeoPoint;
   contact_value: string;
+  body_type?: BodyType;
+  color?: string;
+  accident_history?: AccidentHistory;
+  owner_count?: number;
+  credit_available?: boolean;
 }
 
 export const autoApi = {

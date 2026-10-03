@@ -33,6 +33,7 @@ class HousingRepository:
         max_deposit: int | None = None,
         min_rent: int | None = None,
         max_rent: int | None = None,
+        amenities: list[str] | None = None,
         status: str | None = "ACTIVE",
         page: int = 1,
         page_size: int = 20,
@@ -44,6 +45,8 @@ class HousingRepository:
             query["city"] = city
         if status:
             query["status"] = status
+        if amenities:
+            query["amenities"] = {"$all": amenities}
         if min_deposit is not None or max_deposit is not None:
             deposit_filter: dict[str, Any] = {}
             if min_deposit is not None:

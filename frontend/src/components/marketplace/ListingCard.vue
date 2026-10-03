@@ -4,17 +4,21 @@ import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
 import { ImageOff } from "lucide-vue-next";
 
+import LikeButton from "@/components/common/LikeButton.vue";
 import { useUserLocationStore } from "@/stores/userLocationStore";
 import type { MarketplaceListing } from "@/types/marketplace";
-import { formatKrw } from "@/utils/format";
+import { formatKrw, formatRelativeTime } from "@/utils/format";
 
-const props = defineProps<{ listing: MarketplaceListing }>();
-const { t } = useI18n();
+const props = withDefaults(defineProps<{ listing: MarketplaceListing; liked?: boolean }>(), { liked: false });
+const { t, d } = useI18n();
 const locationStore = useUserLocationStore();
 
 const isFree = computed(() => props.listing.price === 0);
 const distanceInfo = computed(() =>
   locationStore.getDistanceInfo(props.listing.location?.coordinates, props.listing.city),
+);
+const relativeTime = computed(() =>
+  formatRelativeTime(props.listing.created_at, (date) => String(d(date, { year: "numeric", month: "short", day: "numeric" } as never))),
 );
 </script>
 
@@ -36,9 +40,20 @@ const distanceInfo = computed(() =>
       >
         ★ Hududingizda
       </span>
+
+      <!-- Like button (top-right), Daangn-style -->
+      <div class="absolute right-2 top-2 rounded-full bg-white/90 shadow-md backdrop-blur">
+        <LikeButton target-type="MARKETPLACE" :target-id="listing.id" :liked="liked" :like-count="listing.like_count" size="sm" @click.stop />
+      </div>
     </div>
     <div class="flex flex-1 flex-col gap-1.5 p-4">
-      <span class="text-xs font-semibold text-yulda-gray-400">{{ t(`marketplace.category.${listing.category}`) }}</span>
+      <div class="flex items-center gap-1.5 text-xs font-semibold text-yulda-gray-400">
+        <span>{{ t(`marketplace.category.${listing.category}`) }}</span>
+        <template v-if="relativeTime">
+          <span>&middot;</span>
+          <span>{{ relativeTime }}</span>
+        </template>
+      </div>
       <h3 class="line-clamp-2 text-sm font-bold text-yulda-black">{{ listing.title }}</h3>
       <p class="mt-auto text-base font-extrabold text-yulda-black">
         <span v-if="isFree" class="text-yulda-gold">{{ t("marketplace.category.FREE") }}</span>

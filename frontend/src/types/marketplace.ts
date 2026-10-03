@@ -27,4 +27,5 @@ export interface MarketplaceListing {
   seller: SellerSummary;
   created_at: string;
   updated_at: string;
+  like_count: number;
 }

@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timezone
 from typing import Any
 
@@ -36,6 +37,11 @@ class AutoRepository:
         max_year: int | None = None,
         min_price: int | None = None,
         max_price: int | None = None,
+        min_mileage: int | None = None,
+        max_mileage: int | None = None,
+        body_type: str | None = None,
+        color: str | None = None,
+        accident_history: str | None = None,
         status: str | None = "ACTIVE",
         page: int = 1,
         page_size: int = 20,
@@ -44,13 +50,19 @@ class AutoRepository:
         if listing_type:
             query["listing_type"] = listing_type
         if make:
-            query["make"] = make
+            query["make"] = re.compile(f"^{re.escape(make)}", re.IGNORECASE)
         if fuel_type:
             query["fuel_type"] = fuel_type
         if transmission:
             query["transmission"] = transmission
         if city:
             query["city"] = city
+        if body_type:
+            query["body_type"] = body_type
+        if color:
+            query["color"] = re.compile(f"^{re.escape(color)}$", re.IGNORECASE)
+        if accident_history:
+            query["accident_history"] = accident_history
         if status:
             query["status"] = status
         if min_year is not None or max_year is not None:
@@ -67,6 +79,13 @@ class AutoRepository:
             if max_price is not None:
                 price_filter["$lte"] = max_price
             query["price"] = price_filter
+        if min_mileage is not None or max_mileage is not None:
+            mileage_filter: dict[str, Any] = {}
+            if min_mileage is not None:
+                mileage_filter["$gte"] = min_mileage
+            if max_mileage is not None:
+                mileage_filter["$lte"] = max_mileage
+            query["mileage_km"] = mileage_filter
 
         total = await self._collection.count_documents(query)
         cursor = (

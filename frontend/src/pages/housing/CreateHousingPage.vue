@@ -11,7 +11,7 @@ import DatePicker from "@/components/common/DatePicker.vue";
 import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PhotoUploader from "@/components/common/PhotoUploader.vue";
 import { useHousingStore } from "@/stores/housingStore";
-import type { HousingAmenity, HousingType } from "@/types/housing";
+import type { HousingAmenity, HousingDirection, HousingType } from "@/types/housing";
 import type { GeocodedLocation } from "@/utils/geo";
 
 const { t } = useI18n();
@@ -19,7 +19,15 @@ const router = useRouter();
 const store = useHousingStore();
 
 const types: HousingType[] = ["ONE_ROOM", "TWO_ROOM", "ROOMMATE", "APARTMENT", "COMMERCIAL"];
-const amenitiesList: HousingAmenity[] = ["FRIDGE", "WASHER", "AC", "PARKING"];
+const amenitiesList: HousingAmenity[] = [
+  "FRIDGE", "WASHER", "AC", "PARKING", "TV", "WARDROBE", "BED", "DESK",
+  "SHOE_CABINET", "INDUCTION", "GAS_RANGE", "MICROWAVE", "ELEVATOR",
+  "DIGITAL_LOCK", "CCTV", "BALCONY", "VERANDA_EXPANSION", "INTERNET",
+  "PET_FRIENDLY", "HEATING_FLOOR",
+];
+const directions: HousingDirection[] = [
+  "NORTH", "NORTHEAST", "EAST", "SOUTHEAST", "SOUTH", "SOUTHWEST", "WEST", "NORTHWEST",
+];
 
 const selectedCoords = ref<[number, number] | null>(null);
 
@@ -44,6 +52,12 @@ const form = reactive({
   metro_station: "",
   contact_value: "",
   photos: [] as string[],
+  area_m2: "",
+  room_count: "",
+  floor: "",
+  total_floors: "",
+  building_year: "",
+  direction: "" as HousingDirection | "",
 });
 const isSubmitting = ref(false);
 
@@ -69,6 +83,12 @@ async function handleSubmit() {
       city: form.city || undefined,
       metro_station: form.metro_station || undefined,
       location: selectedCoords.value ? { type: "Point", coordinates: selectedCoords.value } : undefined,
+      area_m2: form.area_m2 ? Number(form.area_m2) : undefined,
+      room_count: form.room_count ? Number(form.room_count) : undefined,
+      floor: form.floor !== "" ? Number(form.floor) : undefined,
+      total_floors: form.total_floors ? Number(form.total_floors) : undefined,
+      building_year: form.building_year ? Number(form.building_year) : undefined,
+      direction: form.direction || undefined,
     });
     router.push(`/housing/${listing.id}`);
   } finally {
@@ -126,6 +146,30 @@ async function handleSubmit() {
       <!-- Interactive Map for pinpointing apartment location -->
       <div class="mt-1">
         <InteractiveMap mode="picker" label="Xaritada joylashuvni belgilang (GPS yoki xaritaga bosib)" height="300px" @select="handleMapLocation" />
+      </div>
+
+      <!-- Optional structural details (Zigbang/PeterPanZ-style) -->
+      <div class="rounded-xl border border-yulda-gray-100 p-4">
+        <p class="text-sm font-semibold text-yulda-black">{{ t("housing.detailsLabel") }}</p>
+        <p class="mt-0.5 text-xs text-yulda-gray-400">{{ t("housing.optionalHint") }}</p>
+
+        <div class="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <BaseInput v-model="form.area_m2" type="number" :label="t('housing.areaM2')" />
+          <BaseInput v-model="form.room_count" type="number" :label="t('housing.roomCount')" />
+          <BaseInput v-model="form.floor" type="number" :label="t('housing.floor')" />
+          <BaseInput v-model="form.total_floors" type="number" :label="t('housing.totalFloors')" />
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <BaseInput v-model="form.building_year" type="number" :label="t('housing.buildingYear')" placeholder="2020" />
+          <div>
+            <label class="label">{{ t("housing.directionLabel") }}</label>
+            <select v-model="form.direction" class="input">
+              <option value="">—</option>
+              <option v-for="dir in directions" :key="dir" :value="dir">{{ t(`housing.direction.${dir}`) }}</option>
+            </select>
+          </div>
+        </div>
       </div>
 
       <div>

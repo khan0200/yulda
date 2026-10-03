@@ -3,7 +3,7 @@ from datetime import date, datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.core.pyobjectid import PyObjectId
-from app.models.housing import HousingAmenity, HousingStatus, HousingType
+from app.models.housing import HousingAmenity, HousingDirection, HousingStatus, HousingType
 from app.schemas.common import GeoPoint, OwnerSummary
 
 
@@ -21,6 +21,12 @@ class HousingCreate(BaseModel):
     metro_station: str | None = Field(default=None, max_length=100)
     contact_value: str = Field(min_length=1, max_length=200)
     location: GeoPoint | None = None
+    area_m2: float | None = Field(default=None, ge=0, le=100_000)
+    room_count: int | None = Field(default=None, ge=0, le=50)
+    floor: int | None = Field(default=None, ge=-5, le=200)
+    total_floors: int | None = Field(default=None, ge=1, le=200)
+    building_year: int | None = Field(default=None, ge=1900, le=2100)
+    direction: HousingDirection | None = None
 
 
 class HousingUpdate(BaseModel):
@@ -32,6 +38,12 @@ class HousingUpdate(BaseModel):
     amenities: list[HousingAmenity] | None = None
     photos: list[str] | None = Field(default=None, max_length=9)
     status: HousingStatus | None = None
+    area_m2: float | None = Field(default=None, ge=0, le=100_000)
+    room_count: int | None = Field(default=None, ge=0, le=50)
+    floor: int | None = Field(default=None, ge=-5, le=200)
+    total_floors: int | None = Field(default=None, ge=1, le=200)
+    building_year: int | None = Field(default=None, ge=1900, le=2100)
+    direction: HousingDirection | None = None
 
 
 class HousingPublic(BaseModel):
@@ -55,3 +67,9 @@ class HousingPublic(BaseModel):
     owner: OwnerSummary
     created_at: datetime
     updated_at: datetime
+    area_m2: float | None = None
+    room_count: int | None = None
+    floor: int | None = None
+    total_floors: int | None = None
+    building_year: int | None = None
+    direction: HousingDirection | None = None

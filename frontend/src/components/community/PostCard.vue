@@ -4,9 +4,10 @@ import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
 import { MessageCircle } from "lucide-vue-next";
 
+import LikeButton from "@/components/common/LikeButton.vue";
 import type { CommunityPost } from "@/types/community";
 
-const props = defineProps<{ post: CommunityPost }>();
+const props = withDefaults(defineProps<{ post: CommunityPost; liked?: boolean }>(), { liked: false });
 const { t, d } = useI18n();
 
 const relativeTime = computed(() => {
@@ -32,9 +33,14 @@ const relativeTime = computed(() => {
       <span v-if="post.city" class="text-xs text-yulda-gray-400">{{ post.city }}</span>
     </div>
 
-    <div>
-      <h3 class="text-base font-bold text-yulda-black">{{ post.title }}</h3>
-      <p class="mt-1 line-clamp-2 text-sm text-yulda-gray-600">{{ post.body }}</p>
+    <div class="flex gap-3">
+      <div class="min-w-0 flex-1">
+        <h3 class="text-base font-bold text-yulda-black">{{ post.title }}</h3>
+        <p class="mt-1 line-clamp-2 text-sm text-yulda-gray-600">{{ post.body }}</p>
+      </div>
+      <div v-if="post.photos[0]" class="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-yulda-gray-100">
+        <img :src="post.photos[0]" :alt="post.title" class="h-full w-full object-cover" />
+      </div>
     </div>
 
     <div class="flex items-center justify-between text-xs text-yulda-gray-400">
@@ -45,9 +51,12 @@ const relativeTime = computed(() => {
         <span>{{ post.author.name }}</span>
         <span v-if="relativeTime">&middot; {{ relativeTime }}</span>
       </div>
-      <div class="flex items-center gap-1">
-        <MessageCircle class="h-3.5 w-3.5" />
-        {{ post.comment_count }}
+      <div class="flex items-center gap-3">
+        <LikeButton target-type="COMMUNITY" :target-id="post.id" :liked="liked" :like-count="post.like_count" size="sm" @click.stop />
+        <div class="flex items-center gap-1">
+          <MessageCircle class="h-3.5 w-3.5" />
+          {{ post.comment_count }}
+        </div>
       </div>
     </div>
   </RouterLink>

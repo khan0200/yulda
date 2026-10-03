@@ -15,6 +15,7 @@ class CommunityRepository:
         doc["created_at"] = now
         doc["updated_at"] = now
         doc["comment_count"] = 0
+        doc["like_count"] = 0
         result = await self._posts.insert_one(doc)
         doc["_id"] = result.inserted_id
         return doc

@@ -1,15 +1,31 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
 import { Plus } from "lucide-vue-next";
 
+import NeighborhoodBar from "@/components/common/NeighborhoodBar.vue";
 import PostCard from "@/components/community/PostCard.vue";
+import { favoriteApi } from "@/services/favoriteApi";
+import { useAuthStore } from "@/stores/authStore";
 import { useCommunityStore } from "@/stores/communityStore";
+import { useUserLocationStore } from "@/stores/userLocationStore";
 import type { PostCategory } from "@/types/community";
 
 const { t } = useI18n();
 const store = useCommunityStore();
+const locationStore = useUserLocationStore();
+const auth = useAuthStore();
+const likedIds = ref<Set<string>>(new Set());
+
+async function loadLikedIds() {
+  if (!auth.isAuthenticated) return;
+  try {
+    likedIds.value = new Set(await favoriteApi.listMine("COMMUNITY"));
+  } catch {
+    likedIds.value = new Set();
+  }
+}
 
 const categories: PostCategory[] = [
   "QUESTION",
@@ -26,7 +42,12 @@ const page = ref(1);
 async function loadPosts(reset = true) {
   if (reset) page.value = 1;
   await store.fetchPosts(
-    { category: activeCategory.value ?? undefined, page: page.value, page_size: 20 },
+    {
+      category: activeCategory.value ?? undefined,
+      city: locationStore.isLocationEnabled ? locationStore.currentCity || undefined : undefined,
+      page: page.value,
+      page_size: 20,
+    },
     !reset,
   );
 }
@@ -41,7 +62,12 @@ async function loadMore() {
   await loadPosts(false);
 }
 
-onMounted(() => loadPosts(true));
+watch(() => [locationStore.isLocationEnabled, locationStore.currentCity], () => loadPosts(true));
+
+onMounted(() => {
+  loadPosts(true);
+  loadLikedIds();
+});
 </script>
 
 <template>
@@ -57,7 +83,10 @@ onMounted(() => loadPosts(true));
       </RouterLink>
     </div>
 
-    <div class="mt-6 flex flex-wrap gap-2">
+    <!-- Daangn-style Neighborhood bar: filters posts to the selected area -->
+    <NeighborhoodBar class="mt-6" />
+
+    <div class="flex flex-wrap gap-2">
       <button
         class="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
         :class="activeCategory === null ? 'bg-yulda-black text-white' : 'bg-yulda-gray-100 text-yulda-gray-600 hover:bg-yulda-gray-200'"
@@ -85,7 +114,7 @@ onMounted(() => loadPosts(true));
     </div>
 
     <div v-else class="mt-6 flex flex-col gap-3">
-      <PostCard v-for="post in store.posts" :key="post.id" :post="post" />
+      <PostCard v-for="post in store.posts" :key="post.id" :post="post" :liked="likedIds.has(post.id)" />
 
       <button
         v-if="store.hasMore"

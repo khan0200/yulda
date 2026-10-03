@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink, useRouter } from "vue-router";
 import { ArrowLeft } from "lucide-vue-next";
@@ -9,8 +9,10 @@ import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
 import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PhotoUploader from "@/components/common/PhotoUploader.vue";
+import SimpleAutocomplete from "@/components/common/SimpleAutocomplete.vue";
+import { getModelsForMake, VEHICLE_MAKES } from "@/data/vehicleCatalog";
 import { useAutoStore } from "@/stores/autoStore";
-import type { AutoListingType, FuelType, TransmissionType } from "@/types/auto";
+import type { AccidentHistory, AutoListingType, BodyType, FuelType, TransmissionType } from "@/types/auto";
 import type { GeocodedLocation } from "@/utils/geo";
 
 const { t } = useI18n();
@@ -20,6 +22,8 @@ const store = useAutoStore();
 const listingTypes: AutoListingType[] = ["SALE", "RENTAL"];
 const fuelTypes: FuelType[] = ["GASOLINE", "DIESEL", "LPG", "HYBRID", "ELECTRIC"];
 const transmissions: TransmissionType[] = ["AUTOMATIC", "MANUAL"];
+const bodyTypes: BodyType[] = ["SEDAN", "SUV", "HATCHBACK", "WAGON", "MINIVAN", "PICKUP", "COUPE", "CONVERTIBLE", "VAN"];
+const accidentHistories: AccidentHistory[] = ["NONE", "MINOR", "MAJOR"];
 
 const selectedCoords = ref<[number, number] | null>(null);
 
@@ -45,8 +49,19 @@ const form = reactive({
   city: "",
   contact_value: "",
   photos: [] as string[],
+  body_type: "" as BodyType | "",
+  color: "",
+  accident_history: "" as AccidentHistory | "",
+  owner_count: "",
+  credit_available: false,
 });
 const isSubmitting = ref(false);
+
+const modelOptions = computed(() => getModelsForMake(form.make));
+
+watch(() => form.make, (newMake, oldMake) => {
+  if (newMake !== oldMake) form.model = "";
+});
 
 async function handleSubmit() {
   if (!form.make.trim() || !form.model.trim() || !form.description.trim() || !form.contact_value.trim()) return;
@@ -60,6 +75,11 @@ async function handleSubmit() {
       rental_price_per_day: form.rental_price_per_day ? Number(form.rental_price_per_day) : undefined,
       city: form.city || undefined,
       location: selectedCoords.value ? { type: "Point", coordinates: selectedCoords.value } : undefined,
+      body_type: form.body_type || undefined,
+      color: form.color || undefined,
+      accident_history: form.accident_history || undefined,
+      owner_count: form.owner_count ? Number(form.owner_count) : undefined,
+      credit_available: form.credit_available,
     });
     router.push(`/auto/${listing.id}`);
   } finally {
@@ -95,8 +115,19 @@ async function handleSubmit() {
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <BaseInput v-model="form.make" :label="t('auto.make')" placeholder="Hyundai" required />
-        <BaseInput v-model="form.model" :label="t('auto.model')" :placeholder="t('auto.modelPlaceholder')" required />
+        <div>
+          <label class="label">{{ t("auto.make") }}</label>
+          <SimpleAutocomplete v-model="form.make" :options="VEHICLE_MAKES" placeholder="Hyundai" />
+        </div>
+        <div>
+          <label class="label">{{ t("auto.model") }}</label>
+          <SimpleAutocomplete
+            v-model="form.model"
+            :options="modelOptions"
+            :disabled="!form.make.trim()"
+            :placeholder="form.make.trim() ? t('auto.modelPlaceholder') : t('auto.make')"
+          />
+        </div>
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -136,6 +167,39 @@ async function handleSubmit() {
       <!-- Interactive Map for pinpointing car location -->
       <div class="mt-1">
         <InteractiveMap mode="picker" label="Xaritada avtomobil turgan joyni belgilang (GPS yoki xaritaga bosib)" height="300px" @select="handleMapLocation" />
+      </div>
+
+      <!-- Optional details: body type, color, accident history, ownership -->
+      <div class="rounded-xl border border-yulda-gray-100 p-4">
+        <p class="text-sm font-semibold text-yulda-black">{{ t("housing.detailsLabel") }}</p>
+        <p class="mt-0.5 text-xs text-yulda-gray-400">{{ t("housing.optionalHint") }}</p>
+
+        <div class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label">{{ t("auto.bodyType.label") }}</label>
+            <select v-model="form.body_type" class="input">
+              <option value="">{{ t("auto.bodyType.all") }}</option>
+              <option v-for="bt in bodyTypes" :key="bt" :value="bt">{{ t(`auto.bodyType.${bt}`) }}</option>
+            </select>
+          </div>
+          <BaseInput v-model="form.color" :label="t('auto.color')" :placeholder="t('auto.colorPlaceholder')" />
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label class="label">{{ t("auto.accidentHistory.label") }}</label>
+            <select v-model="form.accident_history" class="input">
+              <option value="">{{ t("auto.accidentHistory.all") }}</option>
+              <option v-for="ah in accidentHistories" :key="ah" :value="ah">{{ t(`auto.accidentHistory.${ah}`) }}</option>
+            </select>
+          </div>
+          <BaseInput v-model="form.owner_count" type="number" :label="t('auto.ownerCount')" />
+        </div>
+
+        <label class="mt-4 flex items-center gap-2 text-sm text-yulda-gray-700">
+          <input v-model="form.credit_available" type="checkbox" class="h-4 w-4 rounded border-yulda-gray-300" />
+          {{ t("auto.creditAvailable") }}
+        </label>
       </div>
 
       <div>

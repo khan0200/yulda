@@ -3,7 +3,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.core.pyobjectid import PyObjectId
-from app.models.auto import AutoListingStatus, AutoListingType, FuelType, TransmissionType
+from app.models.auto import AccidentHistory, AutoListingStatus, AutoListingType, BodyType, FuelType, TransmissionType
 from app.schemas.common import GeoPoint, OwnerSummary
 
 
@@ -22,6 +22,11 @@ class AutoListingCreate(BaseModel):
     city: str | None = Field(default=None, max_length=100)
     contact_value: str = Field(min_length=1, max_length=200)
     location: GeoPoint | None = None
+    body_type: BodyType | None = None
+    color: str | None = Field(default=None, max_length=50)
+    accident_history: AccidentHistory | None = None
+    owner_count: int | None = Field(default=None, ge=0, le=50)
+    credit_available: bool = False
 
 
 class AutoListingUpdate(BaseModel):
@@ -31,6 +36,11 @@ class AutoListingUpdate(BaseModel):
     mileage_km: int | None = Field(default=None, ge=0, le=2_000_000)
     photos: list[str] | None = Field(default=None, max_length=9)
     status: AutoListingStatus | None = None
+    body_type: BodyType | None = None
+    color: str | None = Field(default=None, max_length=50)
+    accident_history: AccidentHistory | None = None
+    owner_count: int | None = Field(default=None, ge=0, le=50)
+    credit_available: bool | None = None
 
 
 class AutoListingPublic(BaseModel):
@@ -55,3 +65,8 @@ class AutoListingPublic(BaseModel):
     owner: OwnerSummary
     created_at: datetime
     updated_at: datetime
+    body_type: BodyType | None = None
+    color: str | None = None
+    accident_history: AccidentHistory | None = None
+    owner_count: int | None = None
+    credit_available: bool = False

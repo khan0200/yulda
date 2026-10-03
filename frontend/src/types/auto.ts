@@ -4,6 +4,17 @@ export type AutoListingType = "SALE" | "RENTAL";
 export type FuelType = "GASOLINE" | "DIESEL" | "LPG" | "HYBRID" | "ELECTRIC";
 export type TransmissionType = "AUTOMATIC" | "MANUAL";
 export type AutoListingStatus = "ACTIVE" | "RESERVED" | "SOLD" | "UNAVAILABLE";
+export type BodyType =
+  | "SEDAN"
+  | "SUV"
+  | "HATCHBACK"
+  | "WAGON"
+  | "MINIVAN"
+  | "PICKUP"
+  | "COUPE"
+  | "CONVERTIBLE"
+  | "VAN";
+export type AccidentHistory = "NONE" | "MINOR" | "MAJOR";
 
 export interface OwnerSummary {
   id: string;
@@ -31,4 +42,9 @@ export interface AutoListing {
   owner: OwnerSummary;
   created_at: string;
   updated_at: string;
+  body_type: BodyType | null;
+  color: string | null;
+  accident_history: AccidentHistory | null;
+  owner_count: number | null;
+  credit_available: boolean;
 }

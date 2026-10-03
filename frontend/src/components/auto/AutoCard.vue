@@ -36,10 +36,35 @@ const distanceInfo = computed(() =>
       >
         ★ Hududingizda
       </span>
+
+      <!-- Accident-free / credit trust badges -->
+      <div class="absolute right-2.5 top-2.5 flex flex-col items-end gap-1">
+        <span
+          v-if="listing.accident_history === 'NONE'"
+          class="rounded-lg bg-emerald-500/90 px-2 py-0.5 text-[10px] font-bold text-white shadow-md backdrop-blur"
+        >
+          {{ t("auto.accidentHistory.NONE") }}
+        </span>
+        <span
+          v-if="listing.credit_available"
+          class="rounded-lg bg-white/90 px-2 py-0.5 text-[10px] font-bold text-yulda-black shadow-md backdrop-blur"
+        >
+          {{ t("auto.creditAvailable") }}
+        </span>
+      </div>
     </div>
     <div class="flex flex-1 flex-col gap-1.5 p-4">
-      <span class="text-xs font-semibold text-yulda-gray-400">{{ listing.year }} &middot; {{ t(`auto.fuelType.${listing.fuel_type}`) }}</span>
+      <div class="flex items-center gap-1.5 text-xs font-semibold text-yulda-gray-400">
+        <span>{{ listing.year }}</span>
+        <span>&middot;</span>
+        <span>{{ listing.mileage_km.toLocaleString() }} km</span>
+        <template v-if="listing.body_type">
+          <span>&middot;</span>
+          <span>{{ t(`auto.bodyType.${listing.body_type}`) }}</span>
+        </template>
+      </div>
       <h3 class="line-clamp-2 text-sm font-bold text-yulda-black">{{ listing.make }} {{ listing.model }}</h3>
+      <span class="text-xs font-semibold text-yulda-gray-400">{{ t(`auto.fuelType.${listing.fuel_type}`) }}</span>
       <p class="mt-auto text-base font-extrabold text-yulda-black">
         <template v-if="isRental">{{ formatKrw(listing.rental_price_per_day ?? 0) }} {{ t("auto.perDay") }}</template>
         <template v-else>{{ formatKrw(listing.price) }}</template>

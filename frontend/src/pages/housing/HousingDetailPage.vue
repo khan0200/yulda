@@ -111,6 +111,32 @@ onMounted(() => store.fetchListing(listingId.value));
             {{ t(`housing.status.${store.currentListing.status}`) }}
           </span>
 
+          <div
+            v-if="store.currentListing.area_m2 || store.currentListing.room_count || store.currentListing.floor !== null || store.currentListing.building_year || store.currentListing.direction"
+            class="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-yulda-gray-50 p-4 text-center sm:grid-cols-3"
+          >
+            <div v-if="store.currentListing.area_m2">
+              <p class="text-xs text-yulda-gray-400">{{ t("housing.areaM2") }}</p>
+              <p class="mt-1 text-sm font-bold text-yulda-black">{{ store.currentListing.area_m2 }}m²</p>
+            </div>
+            <div v-if="store.currentListing.room_count">
+              <p class="text-xs text-yulda-gray-400">{{ t("housing.roomCount") }}</p>
+              <p class="mt-1 text-sm font-bold text-yulda-black">{{ store.currentListing.room_count }}</p>
+            </div>
+            <div v-if="store.currentListing.floor !== null && store.currentListing.total_floors !== null">
+              <p class="text-xs text-yulda-gray-400">{{ t("housing.floor") }}</p>
+              <p class="mt-1 text-sm font-bold text-yulda-black">{{ store.currentListing.floor }}/{{ store.currentListing.total_floors }}</p>
+            </div>
+            <div v-if="store.currentListing.building_year">
+              <p class="text-xs text-yulda-gray-400">{{ t("housing.buildingYear") }}</p>
+              <p class="mt-1 text-sm font-bold text-yulda-black">{{ store.currentListing.building_year }}</p>
+            </div>
+            <div v-if="store.currentListing.direction">
+              <p class="text-xs text-yulda-gray-400">{{ t("housing.directionLabel") }}</p>
+              <p class="mt-1 text-sm font-bold text-yulda-black">{{ t(`housing.direction.${store.currentListing.direction}`) }}</p>
+            </div>
+          </div>
+
           <p class="mt-4 whitespace-pre-wrap text-sm text-yulda-gray-700">{{ store.currentListing.description }}</p>
 
           <div v-if="store.currentListing.amenities.length > 0" class="mt-4 flex flex-wrap gap-2">

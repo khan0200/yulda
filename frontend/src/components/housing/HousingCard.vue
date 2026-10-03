@@ -37,12 +37,25 @@ const distanceInfo = computed(() =>
       </span>
     </div>
     <div class="flex flex-1 flex-col gap-1.5 p-4">
-      <span class="text-xs font-semibold text-yulda-gray-400">{{ t(`housing.type.${listing.housing_type}`) }}</span>
+      <div class="flex items-center gap-1.5">
+        <span class="text-xs font-semibold text-yulda-gray-400">{{ t(`housing.type.${listing.housing_type}`) }}</span>
+        <template v-if="listing.floor !== null && listing.total_floors !== null">
+          <span class="text-yulda-gray-300">&middot;</span>
+          <span class="text-xs font-semibold text-yulda-gray-400">{{ listing.floor }}/{{ listing.total_floors }}{{ t('housing.floor') }}</span>
+        </template>
+      </div>
       <h3 class="line-clamp-2 text-sm font-bold text-yulda-black">{{ listing.title }}</h3>
-      <p class="mt-auto text-sm font-extrabold text-yulda-black">
+      <p class="text-sm font-extrabold text-yulda-black">
         {{ formatKrw(listing.deposit) }} / {{ formatKrw(listing.monthly_rent) }}
       </p>
-      <div class="flex items-center justify-between text-xs text-yulda-gray-400">
+      <div v-if="listing.area_m2 || listing.room_count || listing.direction" class="flex flex-wrap items-center gap-1.5 text-xs text-yulda-gray-500">
+        <span v-if="listing.area_m2">{{ listing.area_m2 }}m²</span>
+        <span v-if="listing.area_m2 && (listing.room_count || listing.direction)" class="text-yulda-gray-300">&middot;</span>
+        <span v-if="listing.room_count">{{ listing.room_count }}{{ t('housing.roomCount') }}</span>
+        <span v-if="listing.room_count && listing.direction" class="text-yulda-gray-300">&middot;</span>
+        <span v-if="listing.direction">{{ t(`housing.direction.${listing.direction}`) }}</span>
+      </div>
+      <div class="mt-auto flex items-center justify-between text-xs text-yulda-gray-400">
         <div class="flex items-center gap-1.5 truncate">
           <span v-if="listing.metro_station" class="flex items-center gap-1 truncate font-medium text-yulda-gray-600">
             <MapPin class="h-3 w-3 flex-shrink-0" />

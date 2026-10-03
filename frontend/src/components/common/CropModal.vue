@@ -45,13 +45,14 @@ function handleConfirm() {
       </button>
     </div>
 
-    <div class="relative flex-1 px-4 pb-4">
+    <div class="relative min-h-0 flex-1 px-4 pb-4">
       <Cropper
         ref="cropperRef"
-        class="h-full w-full"
+        class="cropper h-full w-full"
         :src="imageSrc"
         :stencil-props="{ aspectRatio: 16 / 9 }"
-        image-restriction="stencil"
+        :resize-image="{ adjustStencil: false }"
+        image-restriction="fit-area"
       />
     </div>
 
