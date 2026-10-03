@@ -1,5 +1,5 @@
-﻿<script setup lang="ts">
-import { computed, ref, watch } from "vue";
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { ChevronLeft, ChevronRight, Calendar, Clock } from "lucide-vue-next";
 
 const props = defineProps<{ modelValue: string; min?: string }>();
@@ -26,6 +26,15 @@ const calYear  = ref(initial.y);
 const calMonth = ref(initial.m);
 
 const showCal  = ref(false);
+const rootEl   = ref<HTMLElement | null>(null);
+
+function onClickOutside(e: MouseEvent) {
+  if (rootEl.value && !rootEl.value.contains(e.target as Node)) {
+    showCal.value = false;
+  }
+}
+onMounted(() => document.addEventListener("mousedown", onClickOutside));
+onUnmounted(() => document.removeEventListener("mousedown", onClickOutside));
 
 // ── Min date ────────────────────────────────────────────────────────────────
 const minDate = computed(() => props.min ? new Date(props.min) : null);
@@ -96,7 +105,7 @@ const timeLabel = computed(() =>
 </script>
 
 <template>
-  <div class="flex gap-3">
+  <div ref="rootEl" class="flex gap-3">
     <!-- ── DATE picker ─────────────────────────────────────────── -->
     <div class="relative flex-1">
       <button
