@@ -66,11 +66,15 @@ const containerStyle = computed(() => {
 });
 
 const mapContainer = ref<HTMLDivElement | null>(null);
+const canvasEl = ref<HTMLCanvasElement | null>(null);
 let map: MapLibreMap | null = null;
 let activeMarker: Marker | null = null;
 let routeMarkers: Marker[] = [];
 let resizeObserver: ResizeObserver | null = null;
 let savedRouteBounds: LngLatBounds | null = null;
+let routeGeoPoints: [number, number][] = []; // [lon, lat] for canvas redraw
+let dashOffset = 0;
+let animFrameId: number | null = null;
 
 const isLocating = ref(false);
 const selectedAddress = ref<string>("");
@@ -167,7 +171,7 @@ function createMarkerElement(type: "start" | "waypoint" | "end" | "picker", labe
     `;
   } else if (type === "start") {
     el.innerHTML = `
-      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 font-bold text-xs text-white shadow-lg ring-2 ring-white">
+      <div class="flex h-8 w-8 items-center justify-center rounded-full bg-yulda-black font-bold text-xs text-white shadow-lg ring-2 ring-yulda-yellow">
         A
       </div>
     `;
@@ -250,37 +254,136 @@ async function handleUseMyLocation() {
   );
 }
 
-function interpolatePoints(points: [number, number][], stepsPerSegment = 60): [number, number][] {
-  if (points.length < 2) return points;
-  const result: [number, number][] = [];
-  for (let i = 0; i < points.length - 1; i++) {
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    for (let step = 0; step < stepsPerSegment; step++) {
-      const t = step / stepsPerSegment;
-      result.push([
-        p1[0] + (p2[0] - p1[0]) * t,
-        p1[1] + (p2[1] - p1[1]) * t,
-      ]);
-    }
+// ─── Canvas overlay: draw dashed A→B line (like Kakao/Naver) ─────────────
+function drawDashedLine() {
+  if (!canvasEl.value || !map || routeGeoPoints.length < 2) return;
+
+  const canvas = canvasEl.value;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const container = map.getContainer();
+  const w = container.clientWidth;
+  const h = container.clientHeight;
+  if (canvas.width !== w) canvas.width = w;
+  if (canvas.height !== h) canvas.height = h;
+
+  ctx.clearRect(0, 0, w, h);
+
+  // Project geo coords → screen pixels
+  const pixels = routeGeoPoints.map((pt) => {
+    const p = map!.project(pt as [number, number]);
+    return { x: p.x, y: p.y };
+  });
+
+  // Marker radius in px (markers are h-8 w-8 = 32px → radius 16px + 2px ring = 18px)
+  const MARKER_RADIUS = 18;
+
+  // Build offset pixels: shift start outward toward next point, end outward toward prev point
+  const pts = pixels.map((p) => ({ ...p }));
+  if (pts.length >= 2) {
+    // Offset start point: move away from center toward pts[1]
+    const dx0 = pts[1].x - pts[0].x;
+    const dy0 = pts[1].y - pts[0].y;
+    const len0 = Math.sqrt(dx0 * dx0 + dy0 * dy0) || 1;
+    pts[0] = { x: pts[0].x + (dx0 / len0) * MARKER_RADIUS, y: pts[0].y + (dy0 / len0) * MARKER_RADIUS };
+
+    // Offset end point: move away from center toward pts[n-2]
+    const last = pts.length - 1;
+    const dx1 = pts[last - 1].x - pts[last].x;
+    const dy1 = pts[last - 1].y - pts[last].y;
+    const len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1) || 1;
+    pts[last] = { x: pts[last].x + (dx1 / len1) * MARKER_RADIUS, y: pts[last].y + (dy1 / len1) * MARKER_RADIUS };
   }
-  result.push(points[points.length - 1]);
-  return result;
+
+  // Compute quadratic bezier control point: midpoint + 10% perpendicular offset
+  const start = pts[0];
+  const end = pts[pts.length - 1];
+  const mid = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
+  const totalLen = Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2);
+  // Perpendicular direction (rotate 90°)
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const len = totalLen || 1;
+  const curveOffset = totalLen * 0.10;
+  const cx = mid.x + (dy / len) * curveOffset;
+  const cy = mid.y - (dx / len) * curveOffset;
+
+  function drawCurvedPath() {
+    ctx!.moveTo(start.x, start.y);
+    ctx!.quadraticCurveTo(cx, cy, end.x, end.y);
+  }
+
+  // 1. Dark outer casing
+  ctx.beginPath();
+  drawCurvedPath();
+  ctx.strokeStyle = "rgba(18, 18, 18, 0.85)";
+  ctx.lineWidth = 7;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.setLineDash([]);
+  ctx.stroke();
+
+  // 2. Yellow dashed line on top
+  ctx.beginPath();
+  drawCurvedPath();
+  ctx.strokeStyle = "#FFD600";
+  ctx.lineWidth = 3.5;
+  ctx.lineCap = "butt";
+  ctx.lineJoin = "round";
+  ctx.setLineDash([16, 11]);
+  ctx.lineDashOffset = -dashOffset;
+  ctx.stroke();
+  ctx.setLineDash([]);
 }
+
+function startDashAnimation() {
+  if (animFrameId !== null) cancelAnimationFrame(animFrameId);
+  const DASH_CYCLE = 27; // 16 dash + 11 gap
+  function tick() {
+    dashOffset = (dashOffset + 0.5) % DASH_CYCLE;
+    drawDashedLine();
+    animFrameId = requestAnimationFrame(tick);
+  }
+  animFrameId = requestAnimationFrame(tick);
+}
+
+function stopDashAnimation() {
+  if (animFrameId !== null) {
+    cancelAnimationFrame(animFrameId);
+    animFrameId = null;
+  }
+}
+
+function clearCanvas() {
+  stopDashAnimation();
+  routeGeoPoints = [];
+  dashOffset = 0;
+  if (!canvasEl.value) return;
+  const ctx = canvasEl.value.getContext("2d");
+  if (ctx) ctx.clearRect(0, 0, canvasEl.value.width, canvasEl.value.height);
+}
+
+function bindMapRedraw() {
+  if (!map) return;
+  const redraw = () => drawDashedLine();
+  map.on("move", redraw);
+  map.on("zoom", redraw);
+  map.on("rotate", redraw);
+  map.on("pitch", redraw);
+  map.on("resize", redraw);
+  map.on("render", redraw);
+}
+// ─────────────────────────────────────────────────────────────────────────
 
 async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: number }>) {
   if (!map) return;
 
-  // Clear existing markers & route layer
+  // Clear existing markers & canvas line
   routeMarkers.forEach((m) => m.remove());
   routeMarkers = [];
-
-  if (map.getSource("route")) {
-    if (map.getLayer("route-casing")) map.removeLayer("route-casing");
-    if (map.getLayer("route-fill")) map.removeLayer("route-fill");
-    if (map.getLayer("route-line")) map.removeLayer("route-line");
-    map.removeSource("route");
-  }
+  clearCanvas();
+  routeInfo.value = null;
 
   const validPoints: [number, number][] = [];
   stops.forEach((stop, idx) => {
@@ -307,77 +410,14 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
 
   if (validPoints.length === 1 && map) {
     savedRouteBounds = null;
-    routeInfo.value = null;
-    map.flyTo({
-      center: validPoints[0],
-      zoom: 12,
-      duration: 800,
-    });
+    map.flyTo({ center: validPoints[0], zoom: 12, duration: 800 });
   }
 
   if (validPoints.length >= 2 && map) {
-    // 1. Interpolate coordinates so WebGL line-dasharray renders smoothly and reliably
-    const interpolatedCoords = interpolatePoints(validPoints, 60);
+    // Store points for canvas redraw on pan/zoom
+    routeGeoPoints = validPoints;
 
-    map.addSource("route", {
-      type: "geojson",
-      data: {
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: interpolatedCoords,
-        },
-      },
-    });
-
-    // Layer 1: Dark outer casing (border for contrast)
-    map.addLayer({
-      id: "route-casing",
-      type: "line",
-      source: "route",
-      layout: {
-        "line-join": "round",
-        "line-cap": "round",
-      },
-      paint: {
-        "line-color": "#121212",
-        "line-width": 8,
-      },
-    });
-
-    // Layer 2: Signature Yulda Yellow solid fill bar
-    map.addLayer({
-      id: "route-fill",
-      type: "line",
-      source: "route",
-      layout: {
-        "line-join": "round",
-        "line-cap": "round",
-      },
-      paint: {
-        "line-color": "#FFD600",
-        "line-width": 5.5,
-      },
-    });
-
-    // Layer 3: Contrasting dashed centerline (- - - - - -)
-    map.addLayer({
-      id: "route-line",
-      type: "line",
-      source: "route",
-      layout: {
-        "line-join": "round",
-        "line-cap": "butt",
-      },
-      paint: {
-        "line-color": "#121212",
-        "line-width": 2,
-        "line-dasharray": [2, 2],
-      },
-    });
-
-    // Fit map bounds to show full route
+    // Fit map to show full route
     const bounds = new LngLatBounds();
     validPoints.forEach((pt) => bounds.extend(pt));
     savedRouteBounds = bounds;
@@ -387,7 +427,11 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
       duration: 1000,
     });
 
-    // 2. Fetch OSRM route data for HUD distance & duration in background
+    // Draw immediately and again after fly animation finishes
+    drawDashedLine();
+    setTimeout(() => startDashAnimation(), 100);
+
+    // Fetch OSRM for HUD
     fetchOSRMRoute(validPoints).then((routeData) => {
       if (routeData) {
         routeInfo.value = {
@@ -460,6 +504,8 @@ onMounted(() => {
 
   instance.on("load", () => {
     map = instance;
+    bindMapRedraw();
+
     if ((props.mode === "picker" || props.mode === "view") && effectiveLocation.value) {
       setPickerLocation(effectiveLocation.value.lat, effectiveLocation.value.lon, undefined, false);
     } else if (props.mode === "route" && props.routeStops.length) {
@@ -479,6 +525,7 @@ onMounted(() => {
   if (mapContainer.value) {
     resizeObserver = new ResizeObserver(() => {
       map?.resize();
+      drawDashedLine();
     });
     resizeObserver.observe(mapContainer.value);
   }
@@ -505,6 +552,7 @@ watch(
 );
 
 onBeforeUnmount(() => {
+  stopDashAnimation();
   if (resizeObserver) {
     resizeObserver.disconnect();
     resizeObserver = null;
@@ -579,6 +627,13 @@ onBeforeUnmount(() => {
 
     <!-- Map Canvas Element -->
     <div ref="mapContainer" class="w-full" :style="containerStyle" />
+
+    <!-- Canvas overlay for dashed A→B line (drawn via Canvas 2D API, like Kakao/Naver) -->
+    <canvas
+      ref="canvasEl"
+      class="pointer-events-none absolute inset-0"
+      style="z-index: 5;"
+    />
   </div>
 </template>
 
