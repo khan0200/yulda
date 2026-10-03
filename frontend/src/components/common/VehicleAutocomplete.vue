@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { Car } from "lucide-vue-next";
 
@@ -8,24 +8,62 @@ const emit = defineEmits<{ "update:modelValue": [v: string] }>();
 const LS_KEY = "yulda_custom_vehicles";
 
 const BUILTIN: string[] = [
-  "Hyundai Sonata",
-  "Hyundai Grandeur",
-  "Hyundai Avante",
-  "Hyundai Ioniq 6",
-  "Hyundai Staria",
-  "Kia K5",
-  "Kia K8",
-  "Kia Carnival",
-  "Kia EV6",
-  "Kia Morning",
-  "Genesis G80",
-  "Genesis G90",
-  "Ssangyong Rexton",
-  "Chevrolet Malibu",
-  "Renault Samsung SM6",
-  "Toyota Camry",
-  "Mercedes-Benz E-Class",
-  "BMW 5 Series",
+  // Hyundai
+  "Hyundai Avante", "Hyundai Sonata", "Hyundai Grandeur", "Hyundai Casper",
+  "Hyundai Kona", "Hyundai Venue", "Hyundai Tucson", "Hyundai Santa Fe",
+  "Hyundai Palisade", "Hyundai Staria", "Hyundai Porter",
+  "Hyundai Ioniq 5", "Hyundai Ioniq 6",
+  // KIA
+  "Kia Morning", "Kia Ray", "Kia K3", "Kia K4", "Kia K5", "Kia K8", "Kia K9",
+  "Kia Seltos", "Kia Sportage", "Kia Sorento", "Kia Telluride",
+  "Kia Carnival", "Kia Bongo", "Kia EV3", "Kia EV6", "Kia EV9",
+  // Genesis
+  "Genesis G70", "Genesis G80", "Genesis G90",
+  "Genesis GV60", "Genesis GV70", "Genesis GV80", "Genesis GV80 Coupe",
+  // Chevrolet
+  "Chevrolet Spark", "Chevrolet Malibu", "Chevrolet Trax",
+  "Chevrolet Trailblazer", "Chevrolet Equinox", "Chevrolet Traverse",
+  "Chevrolet Tahoe", "Chevrolet Colorado",
+  // KGM (SsangYong)
+  "KGM Tivoli", "KGM Korando", "KGM Torres", "KGM Rexton",
+  "KGM Rexton Sports", "KGM Musso", "KGM Torres EVX",
+  // Renault Korea
+  "Renault SM3", "Renault SM5", "Renault SM6", "Renault XM3",
+  "Renault Arkana", "Renault QM6", "Renault Grand Koleos",
+  // BMW
+  "BMW 1 Series", "BMW 2 Series", "BMW 3 Series", "BMW 4 Series",
+  "BMW 5 Series", "BMW 6 Series", "BMW 7 Series",
+  "BMW X1", "BMW X3", "BMW X5", "BMW X6", "BMW X7",
+  "BMW i4", "BMW i5", "BMW i7", "BMW iX",
+  // Mercedes-Benz
+  "Mercedes-Benz A-Class", "Mercedes-Benz C-Class", "Mercedes-Benz E-Class",
+  "Mercedes-Benz S-Class", "Mercedes-Benz CLA", "Mercedes-Benz CLS",
+  "Mercedes-Benz GLA", "Mercedes-Benz GLB", "Mercedes-Benz GLC",
+  "Mercedes-Benz GLE", "Mercedes-Benz GLS", "Mercedes-Benz G-Class",
+  "Mercedes-Benz EQE", "Mercedes-Benz EQS",
+  // Tesla
+  "Tesla Model 3", "Tesla Model Y", "Tesla Model S", "Tesla Model X",
+  // Audi
+  "Audi A3", "Audi A4", "Audi A5", "Audi A6", "Audi A7", "Audi A8",
+  "Audi Q3", "Audi Q5", "Audi Q7", "Audi Q8",
+  "Audi e-tron", "Audi Q4 e-tron",
+  // Volkswagen
+  "Volkswagen Golf", "Volkswagen Jetta", "Volkswagen Passat",
+  "Volkswagen Arteon", "Volkswagen Tiguan", "Volkswagen Touareg",
+  "Volkswagen ID.4",
+  // Volvo
+  "Volvo S60", "Volvo S90", "Volvo XC40", "Volvo XC60", "Volvo XC90",
+  "Volvo EX30", "Volvo EX40", "Volvo EX90",
+  // Lexus
+  "Lexus ES", "Lexus LS", "Lexus UX", "Lexus NX", "Lexus RX", "Lexus GX", "Lexus LM",
+  // Toyota
+  "Toyota Camry", "Toyota Corolla", "Toyota Prius", "Toyota RAV4",
+  "Toyota Highlander", "Toyota Sienna", "Toyota Crown", "Toyota Alphard",
+  // MINI
+  "MINI Cooper", "MINI Clubman", "MINI Countryman", "MINI Aceman",
+  // Porsche
+  "Porsche 718", "Porsche 911", "Porsche Panamera",
+  "Porsche Macan", "Porsche Cayenne", "Porsche Taycan",
 ];
 
 const customVehicles = ref<string[]>([]);
