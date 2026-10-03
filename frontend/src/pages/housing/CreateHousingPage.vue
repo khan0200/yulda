@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import PhotoUploader from "@/components/common/PhotoUploader.vue";
 import { useHousingStore } from "@/stores/housingStore";
 import type { HousingAmenity, HousingType } from "@/types/housing";
 
@@ -29,6 +30,7 @@ const form = reactive({
   city: "",
   metro_station: "",
   contact_value: "",
+  photos: [] as string[],
 });
 const isSubmitting = ref(false);
 
@@ -85,6 +87,11 @@ async function handleSubmit() {
             {{ t(`housing.type.${type}`) }}
           </button>
         </div>
+      </div>
+
+      <div>
+        <label class="label">{{ t("housing.photosLabel") }}</label>
+        <PhotoUploader v-model="form.photos" folder="housing" />
       </div>
 
       <BaseInput v-model="form.title" :label="t('housing.titleLabel')" :placeholder="t('housing.titlePlaceholder')" required />

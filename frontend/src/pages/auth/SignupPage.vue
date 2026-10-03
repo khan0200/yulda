@@ -6,6 +6,7 @@ import { AxiosError } from "axios";
 
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
+import TurnstileWidget from "@/components/common/TurnstileWidget.vue";
 import { useAuthStore } from "@/stores/authStore";
 import type { ApiErrorBody } from "@/types/api";
 
@@ -14,6 +15,7 @@ const auth = useAuthStore();
 const router = useRouter();
 
 const form = reactive({ name: "", email: "", password: "" });
+const turnstileToken = ref("");
 const errorMessage = ref("");
 const isSubmitting = ref(false);
 
@@ -21,7 +23,7 @@ async function handleSubmit() {
   errorMessage.value = "";
   isSubmitting.value = true;
   try {
-    await auth.signup(form);
+    await auth.signup({ ...form, turnstile_token: turnstileToken.value });
     router.push("/");
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -45,6 +47,8 @@ async function handleSubmit() {
       <BaseInput v-model="form.name" :label="t('auth.fullName')" placeholder="Jane Doe" autocomplete="name" required />
       <BaseInput v-model="form.email" type="email" :label="t('auth.email')" placeholder="you@example.com" autocomplete="email" required />
       <BaseInput v-model="form.password" type="password" :label="t('auth.password')" :placeholder="t('auth.passwordPlaceholder')" autocomplete="new-password" required />
+
+      <TurnstileWidget @verified="(token) => (turnstileToken = token)" @expired="turnstileToken = ''" />
 
       <p v-if="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage }}</p>
 

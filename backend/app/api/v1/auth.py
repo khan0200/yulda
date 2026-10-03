@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from motor.motor_asyncio import AsyncIOMotorDatabase
 from redis.asyncio import Redis
 
@@ -23,8 +23,8 @@ def get_auth_service(db: AsyncIOMotorDatabase = Depends(get_db), redis: Redis = 
 
 
 @router.post("/signup", response_model=ApiResponse[TokenPair], status_code=201)
-async def signup(payload: UserCreate, service: AuthService = Depends(get_auth_service)):
-    _, tokens = await service.signup(payload)
+async def signup(payload: UserCreate, request: Request, service: AuthService = Depends(get_auth_service)):
+    _, tokens = await service.signup(payload, remote_ip=request.client.host if request.client else None)
     return ApiResponse(data=tokens, message="Account created successfully")
 
 

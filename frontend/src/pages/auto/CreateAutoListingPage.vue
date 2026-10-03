@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import PhotoUploader from "@/components/common/PhotoUploader.vue";
 import { useAutoStore } from "@/stores/autoStore";
 import type { AutoListingType, FuelType, TransmissionType } from "@/types/auto";
 
@@ -31,6 +32,7 @@ const form = reactive({
   description: "",
   city: "",
   contact_value: "",
+  photos: [] as string[],
 });
 const isSubmitting = ref(false);
 
@@ -115,6 +117,12 @@ async function handleSubmit() {
       </div>
 
       <BaseInput v-model="form.city" :label="t('auto.city')" />
+
+      <div>
+        <label class="label">{{ t("auto.photosLabel") }}</label>
+        <PhotoUploader v-model="form.photos" folder="auto" />
+      </div>
+
       <BaseTextarea v-model="form.description" :label="t('auto.descriptionLabel')" :placeholder="t('auto.descriptionPlaceholder')" :rows="6" required />
       <BaseInput v-model="form.contact_value" :label="t('auto.contactValueLabel')" :placeholder="t('auto.contactValuePlaceholder')" required />
 

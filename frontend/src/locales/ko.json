@@ -270,6 +270,7 @@
     "minPrice": "최소 가격",
     "maxPrice": "최대 가격",
     "city": "지역",
+    "photosLabel": "사진",
     "titleLabel": "제목",
     "titlePlaceholder": "무엇을 판매하시나요?",
     "descriptionLabel": "상세 설명",
@@ -323,6 +324,7 @@
     "metroStation": "지하철역",
     "moveInDate": "입주 가능일",
     "amenitiesLabel": "옵션",
+    "photosLabel": "사진",
     "titleLabel": "제목",
     "titlePlaceholder": "예: 캠퍼스 근처 아늑한 원룸",
     "descriptionLabel": "상세 설명",
@@ -379,6 +381,7 @@
     "perDay": "/ 1일",
     "minPrice": "최소 가격",
     "maxPrice": "최대 가격",
+    "photosLabel": "사진",
     "descriptionLabel": "상세 설명",
     "descriptionPlaceholder": "상태, 이력, 추가 정보...",
     "contactValueLabel": "연락처",
@@ -405,5 +408,13 @@
   "footer": {
     "rights": "모든 권리 보유."
   },
-  "language": "언어"
+  "language": "언어",
+  "upload": {
+    "failed": "사진을 업로드하지 못했습니다. 다시 시도해 주세요.",
+    "remove": "사진 삭제",
+    "cropCancel": "취소",
+    "cropConfirm": "사진 사용",
+    "cropProgress": "사진 {current} / {total}",
+    "cropHint": "드래그하여 위치 조정, 스크롤로 확대/축소"
+  }
 }

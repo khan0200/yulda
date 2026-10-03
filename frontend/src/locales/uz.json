@@ -270,6 +270,7 @@
     "minPrice": "Min narx",
     "maxPrice": "Maks narx",
     "city": "Shahar",
+    "photosLabel": "Rasmlar",
     "titleLabel": "Sarlavha",
     "titlePlaceholder": "Nima sotmoqchisiz?",
     "descriptionLabel": "Tavsif",
@@ -323,6 +324,7 @@
     "metroStation": "Metro bekati",
     "moveInDate": "Ko'chib kirish sanasi",
     "amenitiesLabel": "Qulayliklar",
+    "photosLabel": "Rasmlar",
     "titleLabel": "Sarlavha",
     "titlePlaceholder": "masalan, Kampus yaqinidagi qulay wonroom",
     "descriptionLabel": "Tavsif",
@@ -379,6 +381,7 @@
     "perDay": "/ kuniga",
     "minPrice": "Min narx",
     "maxPrice": "Maks narx",
+    "photosLabel": "Rasmlar",
     "descriptionLabel": "Tavsif",
     "descriptionPlaceholder": "Holati, tarixi, qo'shimcha tafsilotlar...",
     "contactValueLabel": "Aloqa ma'lumotlari",
@@ -405,5 +408,13 @@
   "footer": {
     "rights": "Barcha huquqlar himoyalangan."
   },
-  "language": "Til"
+  "language": "Til",
+  "upload": {
+    "failed": "Rasmni yuklab bo'lmadi. Qayta urinib ko'ring.",
+    "remove": "Rasmni o'chirish",
+    "cropCancel": "Bekor qilish",
+    "cropConfirm": "Rasmni ishlatish",
+    "cropProgress": "Rasm {current} / {total}",
+    "cropHint": "Joyini o'zgartirish uchun suring, kattalashtirish uchun aylantiring"
+  }
 }

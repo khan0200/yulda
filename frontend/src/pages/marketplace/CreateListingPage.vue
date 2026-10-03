@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import PhotoUploader from "@/components/common/PhotoUploader.vue";
 import { useMarketplaceStore } from "@/stores/marketplaceStore";
 import type { ContactMethod, ListingCategory, ListingCondition } from "@/types/marketplace";
 
@@ -27,6 +28,7 @@ const form = reactive({
   city: "",
   contact_method: "CHAT" as ContactMethod,
   contact_value: "",
+  photos: [] as string[],
 });
 const isSubmitting = ref(false);
 
@@ -70,6 +72,11 @@ async function handleSubmit() {
             {{ t(`marketplace.category.${category}`) }}
           </button>
         </div>
+      </div>
+
+      <div>
+        <label class="label">{{ t("marketplace.photosLabel") }}</label>
+        <PhotoUploader v-model="form.photos" folder="marketplace" />
       </div>
 
       <BaseInput v-model="form.title" :label="t('marketplace.titleLabel')" :placeholder="t('marketplace.titlePlaceholder')" required />

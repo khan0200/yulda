@@ -15,7 +15,7 @@ const isFree = computed(() => props.listing.price === 0);
 
 <template>
   <RouterLink :to="`/marketplace/${listing.id}`" class="card flex flex-col overflow-hidden transition-shadow hover:shadow-card-hover">
-    <div class="flex aspect-square items-center justify-center bg-yulda-gray-100">
+    <div class="flex aspect-video items-center justify-center bg-yulda-gray-100">
       <img v-if="listing.photos[0]" :src="listing.photos[0]" :alt="listing.title" class="h-full w-full object-cover" />
       <ImageOff v-else class="h-8 w-8 text-yulda-gray-300" />
     </div>

@@ -20,6 +20,7 @@ from app.core.security import (
 from app.models.user import UserRole, VerificationStatus
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import TokenPair, UserCreate
+from app.services.turnstile_service import verify_turnstile_token
 
 logger = logging.getLogger("yulda.auth")
 
@@ -32,7 +33,9 @@ class AuthService:
         self._users = UserRepository(db)
         self._redis = redis
 
-    async def signup(self, payload: UserCreate) -> tuple[dict[str, Any], TokenPair]:
+    async def signup(self, payload: UserCreate, remote_ip: str | None = None) -> tuple[dict[str, Any], TokenPair]:
+        await verify_turnstile_token(payload.turnstile_token, remote_ip)
+
         existing = await self._users.find_by_email(payload.email)
         if existing:
             raise ConflictError("An account with this email already exists")

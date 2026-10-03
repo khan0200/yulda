@@ -13,6 +13,7 @@ class UserCreate(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     phone: str | None = Field(default=None, max_length=32)
     roles: list[UserRole] = Field(default_factory=lambda: [UserRole.CUSTOMER])
+    turnstile_token: str = Field(default="", max_length=2000)
 
     @field_validator("roles")
     @classmethod

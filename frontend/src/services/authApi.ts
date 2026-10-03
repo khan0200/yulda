@@ -8,6 +8,7 @@ export interface SignupPayload {
   name: string;
   phone?: string;
   roles?: UserRole[];
+  turnstile_token?: string;
 }
 
 export interface LoginPayload {

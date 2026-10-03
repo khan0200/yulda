@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     # Maps
     MAPS_API_KEY: str = ""
 
+    # Cloudflare Turnstile (bot verification)
+    TURNSTILE_SECRET_KEY: str = ""
+    TURNSTILE_ENABLED: bool = False
+
     # Rate limiting
     RATE_LIMIT_DEFAULT: str = "100/minute"
 

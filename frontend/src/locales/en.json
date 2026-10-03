@@ -270,6 +270,7 @@
     "minPrice": "Min price",
     "maxPrice": "Max price",
     "city": "City",
+    "photosLabel": "Photos",
     "titleLabel": "Title",
     "titlePlaceholder": "What are you selling?",
     "descriptionLabel": "Description",
@@ -323,6 +324,7 @@
     "metroStation": "Metro station",
     "moveInDate": "Move-in date",
     "amenitiesLabel": "Amenities",
+    "photosLabel": "Photos",
     "titleLabel": "Title",
     "titlePlaceholder": "e.g. Cozy one-room near campus",
     "descriptionLabel": "Description",
@@ -379,6 +381,7 @@
     "perDay": "/ day",
     "minPrice": "Min price",
     "maxPrice": "Max price",
+    "photosLabel": "Photos",
     "descriptionLabel": "Description",
     "descriptionPlaceholder": "Condition, history, extra details...",
     "contactValueLabel": "Contact details",
@@ -405,5 +408,13 @@
   "footer": {
     "rights": "All rights reserved."
   },
-  "language": "Language"
+  "language": "Language",
+  "upload": {
+    "failed": "Couldn't upload photo. Please try again.",
+    "remove": "Remove photo",
+    "cropCancel": "Cancel",
+    "cropConfirm": "Use photo",
+    "cropProgress": "Photo {current} of {total}",
+    "cropHint": "Drag to reposition, pinch or scroll to zoom"
+  }
 }

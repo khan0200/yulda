@@ -270,6 +270,7 @@
     "minPrice": "Мин. цена",
     "maxPrice": "Макс. цена",
     "city": "Город",
+    "photosLabel": "Фотографии",
     "titleLabel": "Заголовок",
     "titlePlaceholder": "Что вы продаёте?",
     "descriptionLabel": "Описание",
@@ -323,6 +324,7 @@
     "metroStation": "Станция метро",
     "moveInDate": "Дата заселения",
     "amenitiesLabel": "Удобства",
+    "photosLabel": "Фотографии",
     "titleLabel": "Заголовок",
     "titlePlaceholder": "например, Уютный вонрум рядом с кампусом",
     "descriptionLabel": "Описание",
@@ -379,6 +381,7 @@
     "perDay": "/ сутки",
     "minPrice": "Мин. цена",
     "maxPrice": "Макс. цена",
+    "photosLabel": "Фотографии",
     "descriptionLabel": "Описание",
     "descriptionPlaceholder": "Состояние, история, дополнительные детали...",
     "contactValueLabel": "Контактные данные",
@@ -405,5 +408,13 @@
   "footer": {
     "rights": "Все права защищены."
   },
-  "language": "Язык"
+  "language": "Язык",
+  "upload": {
+    "failed": "Не удалось загрузить фото. Попробуйте снова.",
+    "remove": "Удалить фото",
+    "cropCancel": "Отмена",
+    "cropConfirm": "Использовать фото",
+    "cropProgress": "Фото {current} из {total}",
+    "cropHint": "Перетащите, чтобы переместить, или прокрутите для масштабирования"
+  }
 }
