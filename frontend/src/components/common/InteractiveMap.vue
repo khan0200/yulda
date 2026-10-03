@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import { LocateFixed, MapPin, RotateCcw, Route as RouteIcon } from "lucide-vue-next";
 import {
   LngLatBounds,
@@ -70,6 +71,55 @@ let savedRouteBounds: LngLatBounds | null = null;
 const isLocating = ref(false);
 const selectedAddress = ref<string>("");
 const routeInfo = ref<{ distanceKm: number; durationMin: number } | null>(null);
+
+const { locale } = useI18n();
+
+const routeSummary = computed(() => {
+  if (!routeInfo.value) return null;
+
+  const from = props.routeStops[0]?.name?.trim() || "A";
+  const to = props.routeStops[props.routeStops.length - 1]?.name?.trim() || "B";
+  const points = `${from} > ${to}`;
+
+  const dist = `${routeInfo.value.distanceKm} km`;
+
+  const hours = Math.floor(routeInfo.value.durationMin / 60);
+  const mins = routeInfo.value.durationMin % 60;
+  let duration = "";
+  if (hours > 0 && mins > 0) {
+    duration = `${hours} h, ${mins} m`;
+  } else if (hours > 0) {
+    duration = `${hours} h`;
+  } else if (mins > 0) {
+    duration = `${mins} m`;
+  }
+
+  const details = duration ? `${dist} - ${duration}` : dist;
+  return {
+    points,
+    details,
+  };
+});
+
+const recenterTitle = computed(() => {
+  if (locale.value === "ru") return "Центрировать карту / Сбросить масштаб";
+  if (locale.value === "en") return "Recenter map / Reset zoom";
+  if (locale.value === "ko") return "지도 중심 맞추기 / 확대 복원";
+  return "Xaritani markazga keltirish / Masshtabni tiklash";
+});
+
+const gpsButtonText = computed(() => {
+  if (isLocating.value) {
+    if (locale.value === "ru") return "Определение...";
+    if (locale.value === "en") return "Locating...";
+    if (locale.value === "ko") return "위치 확인 중...";
+    return "Aniqlanmoqda...";
+  }
+  if (locale.value === "ru") return "Мое местоположение (GPS)";
+  if (locale.value === "en") return "My Location (GPS)";
+  if (locale.value === "ko") return "내 위치 (GPS)";
+  return "Mening lokatsiyam (GPS)";
+});
 
 // OpenStreetMap standard style (100% full coverage in Korea & Uzbekistan, no watermark)
 const MAP_STYLE: StyleSpecification = {
@@ -437,26 +487,21 @@ onBeforeUnmount(() => {
         @click="handleUseMyLocation"
       >
         <LocateFixed class="h-3.5 w-3.5 text-yulda-yellow" :class="{ 'animate-spin': isLocating }" />
-        <span>{{ isLocating ? "Aniqlanmoqda..." : "Mening lokatsiyam (GPS)" }}</span>
+        <span>{{ gpsButtonText }}</span>
       </button>
     </div>
 
-    <!-- Route HUD Card (Distance & Duration) -->
+    <!-- Route HUD Card (Compact, universal: Seoul > Busan (393 km - 4 h, 35 m)) -->
     <div
-      v-if="mode === 'route' && routeInfo"
-      class="absolute left-3 top-3 z-10 flex items-center gap-3 rounded-xl bg-white/95 px-4 py-2.5 shadow-lg backdrop-blur"
+      v-if="mode === 'route' && routeInfo && routeSummary"
+      class="absolute left-3 top-3 z-10 flex items-center gap-2.5 rounded-xl border border-yulda-gray-200/90 bg-white/95 px-3.5 py-2 shadow-lg backdrop-blur"
     >
-      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-yulda-yellow text-yulda-black font-bold">
-        <RouteIcon class="h-4 w-4" />
+      <div class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-yulda-yellow text-yulda-black font-bold">
+        <RouteIcon class="h-3.5 w-3.5" />
       </div>
-      <div>
-        <p class="text-xs font-medium text-yulda-gray-500">Avto yo'nalish masofasi</p>
-        <p class="text-sm font-bold text-yulda-black">
-          {{ routeInfo.distanceKm }} km
-          <span class="text-xs font-normal text-yulda-gray-500">
-            (~{{ Math.floor(routeInfo.durationMin / 60) > 0 ? `${Math.floor(routeInfo.durationMin / 60)}s ` : '' }}{{ routeInfo.durationMin % 60 }}daq)
-          </span>
-        </p>
+      <div class="flex flex-wrap items-center gap-1.5 text-xs font-bold text-yulda-black">
+        <span>{{ routeSummary.points }}</span>
+        <span class="font-medium text-yulda-gray-500">({{ routeSummary.details }})</span>
       </div>
     </div>
 
@@ -476,7 +521,7 @@ onBeforeUnmount(() => {
       <button
         type="button"
         class="group flex h-[32px] w-[32px] items-center justify-center rounded-xl border border-yulda-gray-200 bg-white text-yulda-gray-700 shadow-md transition-all hover:bg-yulda-yellow hover:text-yulda-black hover:scale-105 active:scale-95"
-        title="Markazga keltirish (Masshtabni tiklash)"
+        :title="recenterTitle"
         @click="handleRecenter"
       >
         <RotateCcw class="h-4 w-4 transition-transform duration-300 group-hover:-rotate-90" />
