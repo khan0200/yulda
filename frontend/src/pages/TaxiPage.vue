@@ -6,6 +6,7 @@ import { Car, Search } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import DateTimePicker from "@/components/common/DateTimePicker.vue";
 import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PlaceAutocomplete from "@/components/common/PlaceAutocomplete.vue";
 import VehicleAutocomplete from "@/components/common/VehicleAutocomplete.vue";
@@ -230,7 +231,10 @@ onMounted(() => runSearch());
           </div>
         </div>
 
-        <BaseInput v-model="postForm.departure_at" type="datetime-local" :min="todayDatetime" :label="t('route.departureLabel')" required />
+        <div>
+          <label class="label">{{ t('route.departureLabel') }} <span class="text-yulda-gold">*</span></label>
+          <DateTimePicker v-model="postForm.departure_at" :min="todayDatetime" />
+        </div>
 
         <div v-if="postForm.post_type === 'OFFER'" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
