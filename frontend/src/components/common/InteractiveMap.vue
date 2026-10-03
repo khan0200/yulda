@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { LocateFixed, MapPin, Route as RouteIcon } from "lucide-vue-next";
 import {
   LngLatBounds,
@@ -25,6 +25,7 @@ const props = withDefaults(
     initialLocation?: Coordinates;
     routeStops?: Array<{ name: string; lat?: number; lon?: number }>;
     height?: string;
+    aspectRatio?: string;
     interactive?: boolean;
     label?: string;
   }>(),
@@ -32,7 +33,8 @@ const props = withDefaults(
     mode: "picker",
     initialLocation: undefined,
     routeStops: () => [],
-    height: "400px",
+    height: undefined,
+    aspectRatio: "16/12",
     interactive: true,
     label: undefined,
   },
@@ -41,6 +43,18 @@ const props = withDefaults(
 const emit = defineEmits<{
   select: [location: GeocodedLocation];
 }>();
+
+const containerStyle = computed(() => {
+  if (props.height) {
+    return { height: props.height };
+  }
+  const ratio = (props.aspectRatio || "16/12").replace(":", " / ");
+  return {
+    aspectRatio: ratio,
+    minHeight: "360px",
+    maxHeight: "680px",
+  };
+});
 
 const mapContainer = ref<HTMLDivElement | null>(null);
 let map: MapLibreMap | null = null;
@@ -272,7 +286,11 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
     // Fit map bounds to show full route
     const bounds = new LngLatBounds();
     validPoints.forEach((pt) => bounds.extend(pt));
-    map.fitBounds(bounds, { padding: 60, maxZoom: 14, duration: 1000 });
+    map.fitBounds(bounds, {
+      padding: { top: 80, bottom: 50, left: 60, right: 60 },
+      maxZoom: 14,
+      duration: 1000,
+    });
   }
 }
 
@@ -407,7 +425,7 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- Map Canvas Element -->
-    <div ref="mapContainer" class="w-full" :style="{ height }" />
+    <div ref="mapContainer" class="w-full" :style="containerStyle" />
   </div>
 </template>
 
