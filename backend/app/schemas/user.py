@@ -28,6 +28,7 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+    turnstile_token: str = Field(default="", max_length=2000)
 
 
 class TokenPair(BaseModel):
@@ -42,6 +43,7 @@ class RefreshRequest(BaseModel):
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
+    turnstile_token: str = Field(default="", max_length=2000)
 
 
 class ResetPasswordRequest(BaseModel):

@@ -5,17 +5,19 @@ import { RouterLink } from "vue-router";
 
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
+import TurnstileWidget from "@/components/common/TurnstileWidget.vue";
 import { authApi } from "@/services/authApi";
 
 const { t } = useI18n();
 const email = ref("");
+const turnstileToken = ref("");
 const isSubmitting = ref(false);
 const submitted = ref(false);
 
 async function handleSubmit() {
   isSubmitting.value = true;
   try {
-    await authApi.forgotPassword(email.value);
+    await authApi.forgotPassword(email.value, turnstileToken.value);
     submitted.value = true;
   } finally {
     isSubmitting.value = false;
@@ -33,6 +35,7 @@ async function handleSubmit() {
     </div>
     <form v-else class="mt-8 flex flex-col gap-4" @submit.prevent="handleSubmit">
       <BaseInput v-model="email" type="email" :label="t('auth.email')" placeholder="you@example.com" autocomplete="email" required />
+      <TurnstileWidget @verified="(token) => (turnstileToken = token)" @expired="turnstileToken = ''" />
       <BaseButton type="submit" full-width :loading="isSubmitting">{{ t("auth.sendResetLink") }}</BaseButton>
     </form>
 

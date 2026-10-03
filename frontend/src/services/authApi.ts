@@ -14,6 +14,7 @@ export interface SignupPayload {
 export interface LoginPayload {
   email: string;
   password: string;
+  turnstile_token?: string;
 }
 
 export const authApi = {
@@ -36,8 +37,8 @@ export const authApi = {
     return data.data;
   },
 
-  async forgotPassword(email: string): Promise<void> {
-    await http.post("/auth/forgot-password", { email });
+  async forgotPassword(email: string, turnstile_token?: string): Promise<void> {
+    await http.post("/auth/forgot-password", { email, turnstile_token });
   },
 
   async resetPassword(token: string, newPassword: string): Promise<void> {

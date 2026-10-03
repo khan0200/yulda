@@ -59,3 +59,24 @@ async def test_signup_succeeds_without_token_when_turnstile_disabled(client):
         json={"email": "no-turnstile@example.com", "password": "StrongPass123", "name": "No Turnstile"},
     )
     assert response.status_code == 201
+
+
+async def test_login_rejects_missing_turnstile_when_enabled(client, monkeypatch):
+    monkeypatch.setattr(settings, "TURNSTILE_ENABLED", True)
+    monkeypatch.setattr(settings, "TURNSTILE_SECRET_KEY", "fake-secret")
+    response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": "no-turnstile@example.com", "password": "StrongPass123"},
+    )
+    assert response.status_code == 422
+
+
+async def test_forgot_password_rejects_missing_turnstile_when_enabled(client, monkeypatch):
+    monkeypatch.setattr(settings, "TURNSTILE_ENABLED", True)
+    monkeypatch.setattr(settings, "TURNSTILE_SECRET_KEY", "fake-secret")
+    response = await client.post(
+        "/api/v1/auth/forgot-password",
+        json={"email": "no-turnstile@example.com"},
+    )
+    assert response.status_code == 422
+

@@ -6,6 +6,7 @@ import { AxiosError } from "axios";
 
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
+import TurnstileWidget from "@/components/common/TurnstileWidget.vue";
 import { useAuthStore } from "@/stores/authStore";
 import type { ApiErrorBody } from "@/types/api";
 
@@ -15,6 +16,7 @@ const router = useRouter();
 const route = useRoute();
 
 const form = reactive({ email: "", password: "" });
+const turnstileToken = ref("");
 const errorMessage = ref("");
 const isSubmitting = ref(false);
 
@@ -22,7 +24,7 @@ async function handleSubmit() {
   errorMessage.value = "";
   isSubmitting.value = true;
   try {
-    await auth.login(form);
+    await auth.login({ ...form, turnstile_token: turnstileToken.value });
     const redirect = typeof route.query.redirect === "string" ? route.query.redirect : "/";
     router.push(redirect);
   } catch (error) {
@@ -52,6 +54,8 @@ async function handleSubmit() {
           {{ t("auth.forgotPassword") }}
         </RouterLink>
       </div>
+
+      <TurnstileWidget @verified="(token) => (turnstileToken = token)" @expired="turnstileToken = ''" />
 
       <p v-if="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage }}</p>
 

@@ -54,7 +54,14 @@ class AuthService:
         tokens = await self._issue_tokens(str(user["_id"]), user["roles"])
         return user, tokens
 
-    async def login(self, email: str, password: str) -> tuple[dict[str, Any], TokenPair]:
+    async def login(
+        self,
+        email: str,
+        password: str,
+        turnstile_token: str = "",
+        remote_ip: str | None = None,
+    ) -> tuple[dict[str, Any], TokenPair]:
+        await verify_turnstile_token(turnstile_token, remote_ip)
         user = await self._users.find_by_email(email)
         if not user or not verify_password(password, user["password_hash"]):
             raise UnauthorizedError("Invalid email or password")
@@ -93,7 +100,13 @@ class AuthService:
         )
         return TokenPair(access_token=access, refresh_token=refresh)
 
-    async def request_password_reset(self, email: str) -> str | None:
+    async def request_password_reset(
+        self,
+        email: str,
+        turnstile_token: str = "",
+        remote_ip: str | None = None,
+    ) -> str | None:
+        await verify_turnstile_token(turnstile_token, remote_ip)
         user = await self._users.find_by_email(email)
         if not user:
             # Do not reveal whether the email exists.

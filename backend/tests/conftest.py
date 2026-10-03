@@ -7,8 +7,11 @@ from httpx import ASGITransport, AsyncClient
 from mongomock_motor import AsyncMongoMockClient
 
 from app.api import deps
+from app.core.config import settings
 from app.core.fake_redis import FakeRedis
 from app.main import app
+
+settings.TURNSTILE_ENABLED = False
 
 
 @pytest.fixture(autouse=True)

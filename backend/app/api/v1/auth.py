@@ -29,8 +29,13 @@ async def signup(payload: UserCreate, request: Request, service: AuthService = D
 
 
 @router.post("/login", response_model=ApiResponse[TokenPair])
-async def login(payload: UserLogin, service: AuthService = Depends(get_auth_service)):
-    _, tokens = await service.login(payload.email, payload.password)
+async def login(payload: UserLogin, request: Request, service: AuthService = Depends(get_auth_service)):
+    _, tokens = await service.login(
+        payload.email,
+        payload.password,
+        turnstile_token=payload.turnstile_token,
+        remote_ip=request.client.host if request.client else None,
+    )
     return ApiResponse(data=tokens, message="Logged in successfully")
 
 
@@ -50,8 +55,12 @@ async def logout(
 
 
 @router.post("/forgot-password", response_model=ApiResponse[None])
-async def forgot_password(payload: ForgotPasswordRequest, service: AuthService = Depends(get_auth_service)):
-    await service.request_password_reset(payload.email)
+async def forgot_password(payload: ForgotPasswordRequest, request: Request, service: AuthService = Depends(get_auth_service)):
+    await service.request_password_reset(
+        payload.email,
+        turnstile_token=payload.turnstile_token,
+        remote_ip=request.client.host if request.client else None,
+    )
     return ApiResponse(data=None, message="If that email exists, a reset link has been sent")
 
 
