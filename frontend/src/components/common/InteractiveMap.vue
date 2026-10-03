@@ -51,28 +51,26 @@ const isLocating = ref(false);
 const selectedAddress = ref<string>("");
 const routeInfo = ref<{ distanceKm: number; durationMin: number } | null>(null);
 
-// Carto Voyager style (crisp, beautiful, modern Apple/Uber-style light map, 100% free)
+// OpenStreetMap standard style (100% free, no API key, no watermark)
 const MAP_STYLE: StyleSpecification = {
   version: 8,
   sources: {
-    "carto-voyager": {
+    "osm-tiles": {
       type: "raster",
       tiles: [
-        "https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png",
-        "https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png",
-        "https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png",
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       ],
       tileSize: 256,
-      attribution: "© OpenStreetMap contributors, © CARTO",
+      attribution: "© OpenStreetMap contributors",
     },
   },
   layers: [
     {
-      id: "carto-voyager-layer",
+      id: "osm-tiles-layer",
       type: "raster",
-      source: "carto-voyager",
+      source: "osm-tiles",
       minzoom: 0,
-      maxzoom: 20,
+      maxzoom: 19,
     },
   ],
 };
