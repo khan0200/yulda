@@ -254,7 +254,7 @@ async function handleUseMyLocation() {
   );
 }
 
-// ─── Canvas overlay: draw dashed A→B line (like Kakao/Naver) ─────────────
+// ─── Canvas overlay: draw dashed line through ALL stops ──────────────────
 function drawDashedLine() {
   if (!canvasEl.value || !map || routeGeoPoints.length < 2) return;
 
@@ -276,19 +276,16 @@ function drawDashedLine() {
     return { x: p.x, y: p.y };
   });
 
-  // Marker radius in px (markers are h-8 w-8 = 32px → radius 16px + 2px ring = 18px)
   const MARKER_RADIUS = 18;
 
-  // Build offset pixels: shift start outward toward next point, end outward toward prev point
+  // Offset only the very first and very last point away from marker centers
   const pts = pixels.map((p) => ({ ...p }));
   if (pts.length >= 2) {
-    // Offset start point: move away from center toward pts[1]
     const dx0 = pts[1].x - pts[0].x;
     const dy0 = pts[1].y - pts[0].y;
     const len0 = Math.sqrt(dx0 * dx0 + dy0 * dy0) || 1;
     pts[0] = { x: pts[0].x + (dx0 / len0) * MARKER_RADIUS, y: pts[0].y + (dy0 / len0) * MARKER_RADIUS };
 
-    // Offset end point: move away from center toward pts[n-2]
     const last = pts.length - 1;
     const dx1 = pts[last - 1].x - pts[last].x;
     const dy1 = pts[last - 1].y - pts[last].y;
@@ -296,27 +293,28 @@ function drawDashedLine() {
     pts[last] = { x: pts[last].x + (dx1 / len1) * MARKER_RADIUS, y: pts[last].y + (dy1 / len1) * MARKER_RADIUS };
   }
 
-  // Compute quadratic bezier control point: midpoint + 10% perpendicular offset
-  const start = pts[0];
-  const end = pts[pts.length - 1];
-  const mid = { x: (start.x + end.x) / 2, y: (start.y + end.y) / 2 };
-  const totalLen = Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2);
-  // Perpendicular direction (rotate 90°)
-  const dx = end.x - start.x;
-  const dy = end.y - start.y;
-  const len = totalLen || 1;
-  const curveOffset = totalLen * 0.10;
-  const cx = mid.x + (dy / len) * curveOffset;
-  const cy = mid.y - (dx / len) * curveOffset;
+  // Build control points for each segment (10% perpendicular curve)
+  function segmentCP(a: {x:number;y:number}, b: {x:number;y:number}) {
+    const mx = (a.x + b.x) / 2;
+    const my = (a.y + b.y) / 2;
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len = Math.sqrt(dx * dx + dy * dy) || 1;
+    const offset = len * 0.10;
+    return { cx: mx + (dy / len) * offset, cy: my - (dx / len) * offset };
+  }
 
-  function drawCurvedPath() {
-    ctx!.moveTo(start.x, start.y);
-    ctx!.quadraticCurveTo(cx, cy, end.x, end.y);
+  function drawAllSegments() {
+    for (let i = 0; i < pts.length - 1; i++) {
+      const { cx, cy } = segmentCP(pts[i], pts[i + 1]);
+      ctx!.moveTo(pts[i].x, pts[i].y);
+      ctx!.quadraticCurveTo(cx, cy, pts[i + 1].x, pts[i + 1].y);
+    }
   }
 
   // 1. Dark outer casing
   ctx.beginPath();
-  drawCurvedPath();
+  drawAllSegments();
   ctx.strokeStyle = "rgba(18, 18, 18, 0.85)";
   ctx.lineWidth = 7;
   ctx.lineCap = "round";
@@ -326,7 +324,7 @@ function drawDashedLine() {
 
   // 2. Yellow dashed line on top
   ctx.beginPath();
-  drawCurvedPath();
+  drawAllSegments();
   ctx.strokeStyle = "#FFD600";
   ctx.lineWidth = 3.5;
   ctx.lineCap = "butt";
