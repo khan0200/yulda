@@ -111,7 +111,7 @@ async function handleSubmit() {
 
       <!-- Interactive Map for pinpointing item location -->
       <div class="mt-1">
-        <InteractiveMap mode="picker" label="Xaritada mahsulot turgan joyni belgilang (GPS yoki xaritaga bosib)" height="240px" @select="handleMapLocation" />
+        <InteractiveMap mode="picker" label="Xaritada mahsulot turgan joyni belgilang (GPS yoki xaritaga bosib)" height="300px" @select="handleMapLocation" />
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">

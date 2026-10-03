@@ -124,7 +124,7 @@ async function handleSubmit() {
 
       <!-- Interactive Map for pinpointing apartment location -->
       <div class="mt-1">
-        <InteractiveMap mode="picker" label="Xaritada joylashuvni belgilang (GPS yoki xaritaga bosib)" height="240px" @select="handleMapLocation" />
+        <InteractiveMap mode="picker" label="Xaritada joylashuvni belgilang (GPS yoki xaritaga bosib)" height="300px" @select="handleMapLocation" />
       </div>
 
       <div>

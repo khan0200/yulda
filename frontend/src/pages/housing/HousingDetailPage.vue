@@ -138,7 +138,7 @@ onMounted(() => store.fetchListing(listingId.value));
               mode="view"
               :initial-coords="listingCoords"
               label="Uy joylashuvi xaritada"
-              height="200px"
+              height="280px"
             />
           </div>
 

@@ -32,7 +32,7 @@ const props = withDefaults(
     mode: "picker",
     initialLocation: undefined,
     routeStops: () => [],
-    height: "360px",
+    height: "400px",
     interactive: true,
     label: undefined,
   },
@@ -46,6 +46,7 @@ const mapContainer = ref<HTMLDivElement | null>(null);
 let map: MapLibreMap | null = null;
 let activeMarker: Marker | null = null;
 let routeMarkers: Marker[] = [];
+let resizeObserver: ResizeObserver | null = null;
 
 const isLocating = ref(false);
 const selectedAddress = ref<string>("");
@@ -310,6 +311,13 @@ onMounted(() => {
   });
 
   map = instance;
+
+  if (mapContainer.value) {
+    resizeObserver = new ResizeObserver(() => {
+      map?.resize();
+    });
+    resizeObserver.observe(mapContainer.value);
+  }
 });
 
 watch(
@@ -333,6 +341,10 @@ watch(
 );
 
 onBeforeUnmount(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+    resizeObserver = null;
+  }
   if (map) {
     map.remove();
     map = null;

@@ -133,7 +133,7 @@ async function handleSubmit() {
 
       <!-- Interactive Map for pinpointing car location -->
       <div class="mt-1">
-        <InteractiveMap mode="picker" label="Xaritada avtomobil turgan joyni belgilang (GPS yoki xaritaga bosib)" height="240px" @select="handleMapLocation" />
+        <InteractiveMap mode="picker" label="Xaritada avtomobil turgan joyni belgilang (GPS yoki xaritaga bosib)" height="300px" @select="handleMapLocation" />
       </div>
 
       <div>
