@@ -8,9 +8,13 @@ import {
   Marker,
   NavigationControl,
   Popup,
+  setWorkerUrl,
   type StyleSpecification,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+
+setWorkerUrl(workerUrl);
 
 import {
   fetchOSRMRoute,
@@ -255,6 +259,7 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
 
   if (map.getSource("route")) {
     if (map.getLayer("route-casing")) map.removeLayer("route-casing");
+    if (map.getLayer("route-fill")) map.removeLayer("route-fill");
     if (map.getLayer("route-line")) map.removeLayer("route-line");
     map.removeSource("route");
   }
@@ -307,7 +312,7 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
       },
     });
 
-    // Sleek dashed line (- - - - - -) with subtle white casing for contrast
+    // Layer 1: Dark outer casing (border for contrast)
     map.addLayer({
       id: "route-casing",
       type: "line",
@@ -317,14 +322,14 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
         "line-cap": "round",
       },
       paint: {
-        "line-color": "#ffffff",
-        "line-width": 6,
-        "line-opacity": 0.9,
+        "line-color": "#121212",
+        "line-width": 8,
       },
     });
 
+    // Layer 2: Signature Yulda Yellow solid fill bar
     map.addLayer({
-      id: "route-line",
+      id: "route-fill",
       type: "line",
       source: "route",
       layout: {
@@ -332,8 +337,23 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
         "line-cap": "round",
       },
       paint: {
+        "line-color": "#FFD600",
+        "line-width": 5.5,
+      },
+    });
+
+    // Layer 3: Contrasting dashed centerline (- - - - - -)
+    map.addLayer({
+      id: "route-line",
+      type: "line",
+      source: "route",
+      layout: {
+        "line-join": "round",
+        "line-cap": "butt",
+      },
+      paint: {
         "line-color": "#121212",
-        "line-width": 3.5,
+        "line-width": 2,
         "line-dasharray": [2, 2],
       },
     });
