@@ -16,6 +16,25 @@ export function formatPriceNote(val: string | null | undefined): string {
   return trimmed;
 }
 
+export function formatDateOnly(isoDate: string | Date | null | undefined): string {
+  if (!isoDate) return "";
+  const date = typeof isoDate === "string" ? new Date(isoDate) : isoDate;
+  if (isNaN(date.getTime())) return "";
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+export function formatTimeOnly(isoDate: string | Date | null | undefined): string {
+  if (!isoDate) return "";
+  const date = typeof isoDate === "string" ? new Date(isoDate) : isoDate;
+  if (isNaN(date.getTime())) return "";
+  const h = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  return `${h}:${min}`;
+}
+
 export function formatRelativeTime(isoDate: string, formatDate: (date: Date) => string): string {
   const date = new Date(isoDate);
   const diffMs = Date.now() - date.getTime();
