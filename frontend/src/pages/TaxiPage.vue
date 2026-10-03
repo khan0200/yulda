@@ -6,6 +6,7 @@ import { Car, Search } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PlaceAutocomplete from "@/components/common/PlaceAutocomplete.vue";
 import RoutePostCard from "@/components/route/RoutePostCard.vue";
 import RouteStopsBuilder from "@/components/route/RouteStopsBuilder.vue";
@@ -13,6 +14,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useRouteStore } from "@/stores/routeStore";
 import type { RoutePostType } from "@/types/route";
 import type { RouteStop } from "@/types/route";
+import type { GeocodedLocation } from "@/utils/geo";
 
 const { t } = useI18n();
 const auth = useAuthStore();
@@ -22,6 +24,17 @@ const activeTab = ref<"search" | "post">("search");
 
 const searchForm = reactive({ fromCity: "", toCity: "", date: "" });
 const hasSearched = ref(false);
+
+const searchRouteStops = computed(() => {
+  const list: Array<{ name: string }> = [];
+  if (searchForm.fromCity.trim()) list.push({ name: searchForm.fromCity.trim() });
+  if (searchForm.toCity.trim()) list.push({ name: searchForm.toCity.trim() });
+  return list;
+});
+
+function handleLocationSelected(loc: GeocodedLocation) {
+  searchForm.fromCity = loc.city || loc.name;
+}
 
 async function runSearch() {
   hasSearched.value = true;
@@ -150,6 +163,14 @@ onMounted(() => runSearch());
         </BaseButton>
       </div>
 
+      <!-- Map route preview for search -->
+      <div v-if="searchRouteStops.length >= 2" class="mt-4">
+        <InteractiveMap mode="route" :route-stops="searchRouteStops" label="Qidirilayotgan marshrut xaritasi" height="280px" />
+      </div>
+      <div v-else-if="!searchForm.fromCity" class="mt-4">
+        <InteractiveMap mode="picker" label="Turgan joyingizni tanlang (A nuqta)" height="220px" @select="handleLocationSelected" />
+      </div>
+
       <div v-if="store.isLoading" class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div v-for="i in 4" :key="i" class="card h-40 animate-pulse bg-yulda-gray-100" />
       </div>
@@ -193,6 +214,10 @@ onMounted(() => runSearch());
         <div>
           <label class="label">{{ t("route.routeLabel") }}</label>
           <RouteStopsBuilder v-model="postForm.stops" fixed-country="KR" />
+          <!-- Map preview of driver route stops -->
+          <div v-if="postForm.stops.filter((s) => s.name.trim()).length >= 2" class="mt-3">
+            <InteractiveMap mode="route" :route-stops="postForm.stops" label="Safar marshruti vizualizatsiyasi" height="280px" />
+          </div>
         </div>
 
         <BaseInput v-model="postForm.departure_at" type="datetime-local" :label="t('route.departureLabel')" required />

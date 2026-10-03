@@ -7,9 +7,11 @@ import { ArrowLeft } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PhotoUploader from "@/components/common/PhotoUploader.vue";
 import { useHousingStore } from "@/stores/housingStore";
 import type { HousingAmenity, HousingType } from "@/types/housing";
+import type { GeocodedLocation } from "@/utils/geo";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -17,6 +19,11 @@ const store = useHousingStore();
 
 const types: HousingType[] = ["ONE_ROOM", "TWO_ROOM", "ROOMMATE", "APARTMENT", "COMMERCIAL"];
 const amenitiesList: HousingAmenity[] = ["FRIDGE", "WASHER", "AC", "PARKING"];
+
+function handleMapLocation(loc: GeocodedLocation) {
+  if (loc.city) form.city = loc.city;
+  else if (loc.name) form.city = loc.name;
+}
 
 const form = reactive({
   housing_type: "ONE_ROOM" as HousingType,
@@ -107,6 +114,11 @@ async function handleSubmit() {
         <BaseInput v-model="form.city" :label="t('housing.city')" />
         <BaseInput v-model="form.metro_station" :label="t('housing.metroStation')" />
         <BaseInput v-model="form.move_in_date" type="date" :label="t('housing.moveInDate')" />
+      </div>
+
+      <!-- Interactive Map for pinpointing apartment location -->
+      <div class="mt-1">
+        <InteractiveMap mode="picker" label="Xaritada joylashuvni belgilang (GPS yoki xaritaga bosib)" height="240px" @select="handleMapLocation" />
       </div>
 
       <div>
