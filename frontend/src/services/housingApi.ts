@@ -25,6 +25,7 @@ export interface CreateHousingPayload {
   photos?: string[];
   city?: string;
   metro_station?: string;
+  location?: import("@/types/user").GeoPoint;
   contact_value: string;
 }
 

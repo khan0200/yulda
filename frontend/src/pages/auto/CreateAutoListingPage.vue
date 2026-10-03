@@ -7,9 +7,11 @@ import { ArrowLeft } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PhotoUploader from "@/components/common/PhotoUploader.vue";
 import { useAutoStore } from "@/stores/autoStore";
 import type { AutoListingType, FuelType, TransmissionType } from "@/types/auto";
+import type { GeocodedLocation } from "@/utils/geo";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -18,6 +20,16 @@ const store = useAutoStore();
 const listingTypes: AutoListingType[] = ["SALE", "RENTAL"];
 const fuelTypes: FuelType[] = ["GASOLINE", "DIESEL", "LPG", "HYBRID", "ELECTRIC"];
 const transmissions: TransmissionType[] = ["AUTOMATIC", "MANUAL"];
+
+const selectedCoords = ref<[number, number] | null>(null);
+
+function handleMapLocation(loc: GeocodedLocation) {
+  if (loc.city) form.city = loc.city;
+  else if (loc.name) form.city = loc.name;
+  if (typeof loc.lat === "number" && typeof loc.lon === "number") {
+    selectedCoords.value = [loc.lon, loc.lat];
+  }
+}
 
 const form = reactive({
   listing_type: "SALE" as AutoListingType,
@@ -47,6 +59,7 @@ async function handleSubmit() {
       price: Number(form.price) || 0,
       rental_price_per_day: form.rental_price_per_day ? Number(form.rental_price_per_day) : undefined,
       city: form.city || undefined,
+      location: selectedCoords.value ? { type: "Point", coordinates: selectedCoords.value } : undefined,
     });
     router.push(`/auto/${listing.id}`);
   } finally {
@@ -117,6 +130,11 @@ async function handleSubmit() {
       </div>
 
       <BaseInput v-model="form.city" :label="t('auto.city')" />
+
+      <!-- Interactive Map for pinpointing car location -->
+      <div class="mt-1">
+        <InteractiveMap mode="picker" label="Xaritada avtomobil turgan joyni belgilang (GPS yoki xaritaga bosib)" height="240px" @select="handleMapLocation" />
+      </div>
 
       <div>
         <label class="label">{{ t("auto.photosLabel") }}</label>

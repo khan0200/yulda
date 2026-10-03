@@ -29,6 +29,7 @@ export interface CreateAutoListingPayload {
   description: string;
   photos?: string[];
   city?: string;
+  location?: import("@/types/user").GeoPoint;
   contact_value: string;
 }
 

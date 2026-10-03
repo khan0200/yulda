@@ -4,9 +4,11 @@ import { useI18n } from "vue-i18n";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 import { ArrowLeft, CheckCircle2, ImageOff, Trash2 } from "lucide-vue-next";
 
+import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import { useAuthStore } from "@/stores/authStore";
 import { useHousingStore } from "@/stores/housingStore";
 import { formatKrw } from "@/utils/format";
+import { getCityCoordinates, type Coordinates } from "@/utils/geo";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -17,6 +19,17 @@ const store = useHousingStore();
 const listingId = computed(() => route.params.id as string);
 const isOwner = computed(() => {
   return Boolean(auth.user && store.currentListing && store.currentListing.owner.id === auth.user.id);
+});
+
+const listingCoords = computed<Coordinates | undefined>(() => {
+  if (store.currentListing?.location?.coordinates) {
+    const [lon, lat] = store.currentListing.location.coordinates;
+    return { lat, lon };
+  }
+  if (store.currentListing?.city) {
+    return getCityCoordinates(store.currentListing.city) ?? undefined;
+  }
+  return undefined;
 });
 
 async function handleDelete() {
@@ -117,6 +130,16 @@ onMounted(() => store.fetchListing(listingId.value));
             <span>{{ store.currentListing.owner.name }}</span>
             <span v-if="store.currentListing.metro_station">&middot; {{ store.currentListing.metro_station }}</span>
             <span v-else-if="store.currentListing.city">&middot; {{ store.currentListing.city }}</span>
+          </div>
+
+          <!-- Interactive Map View -->
+          <div v-if="listingCoords" class="mt-4">
+            <InteractiveMap
+              mode="view"
+              :initial-coords="listingCoords"
+              label="Uy joylashuvi xaritada"
+              height="200px"
+            />
           </div>
 
           <div class="mt-4 rounded-xl bg-yulda-gray-50 p-4">

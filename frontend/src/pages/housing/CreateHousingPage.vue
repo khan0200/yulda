@@ -20,9 +20,14 @@ const store = useHousingStore();
 const types: HousingType[] = ["ONE_ROOM", "TWO_ROOM", "ROOMMATE", "APARTMENT", "COMMERCIAL"];
 const amenitiesList: HousingAmenity[] = ["FRIDGE", "WASHER", "AC", "PARKING"];
 
+const selectedCoords = ref<[number, number] | null>(null);
+
 function handleMapLocation(loc: GeocodedLocation) {
   if (loc.city) form.city = loc.city;
   else if (loc.name) form.city = loc.name;
+  if (typeof loc.lat === "number" && typeof loc.lon === "number") {
+    selectedCoords.value = [loc.lon, loc.lat];
+  }
 }
 
 const form = reactive({
@@ -62,6 +67,7 @@ async function handleSubmit() {
       move_in_date: form.move_in_date || undefined,
       city: form.city || undefined,
       metro_station: form.metro_station || undefined,
+      location: selectedCoords.value ? { type: "Point", coordinates: selectedCoords.value } : undefined,
     });
     router.push(`/housing/${listing.id}`);
   } finally {

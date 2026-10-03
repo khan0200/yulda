@@ -20,6 +20,7 @@ export interface CreateListingPayload {
   condition: ListingCondition;
   photos?: string[];
   city?: string;
+  location?: import("@/types/user").GeoPoint;
   contact_method: ContactMethod;
   contact_value: string;
 }

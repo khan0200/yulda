@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
 import { Plus } from "lucide-vue-next";
 
+import NeighborhoodBar from "@/components/common/NeighborhoodBar.vue";
 import ListingCard from "@/components/marketplace/ListingCard.vue";
 import { useMarketplaceStore } from "@/stores/marketplaceStore";
+import { useUserLocationStore } from "@/stores/userLocationStore";
 import type { ListingCategory, ListingCondition } from "@/types/marketplace";
 
 const { t } = useI18n();
 const store = useMarketplaceStore();
+const locationStore = useUserLocationStore();
 
 const categories: ListingCategory[] = ["ELECTRONICS", "FURNITURE", "BIKES", "CLOTHING", "FOOD", "FREE", "OTHER"];
 const conditions: ListingCondition[] = ["NEW", "USED"];
@@ -17,6 +20,14 @@ const conditions: ListingCondition[] = ["NEW", "USED"];
 const activeCategory = ref<ListingCategory | null>(null);
 const filters = reactive({ condition: "", minPrice: "", maxPrice: "", city: "" });
 const page = ref(1);
+
+const sortedListings = computed(() => {
+  return locationStore.sortByProximity(
+    store.listings,
+    (item) => item.location?.coordinates,
+    (item) => item.city,
+  );
+});
 
 async function loadListings(reset = true) {
   if (reset) page.value = 1;
@@ -59,6 +70,9 @@ onMounted(() => loadListings(true));
         {{ t("marketplace.newListing") }}
       </RouterLink>
     </div>
+
+    <!-- Daangn-style Neighborhood bar for local-first listings -->
+    <NeighborhoodBar class="mt-6" />
 
     <div class="mt-6 flex flex-wrap gap-2">
       <button
@@ -113,7 +127,7 @@ onMounted(() => loadListings(true));
 
     <div v-else>
       <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        <ListingCard v-for="listing in store.listings" :key="listing.id" :listing="listing" />
+        <ListingCard v-for="listing in sortedListings" :key="listing.id" :listing="listing" />
       </div>
 
       <div v-if="store.hasMore" class="mt-6 flex justify-center">

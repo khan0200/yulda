@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
 import { Plus } from "lucide-vue-next";
 
 import AutoCard from "@/components/auto/AutoCard.vue";
+import NeighborhoodBar from "@/components/common/NeighborhoodBar.vue";
 import { useAutoStore } from "@/stores/autoStore";
+import { useUserLocationStore } from "@/stores/userLocationStore";
 import type { AutoListingType, FuelType, TransmissionType } from "@/types/auto";
 
 const { t } = useI18n();
 const store = useAutoStore();
+const locationStore = useUserLocationStore();
 
 const listingTypes: AutoListingType[] = ["SALE", "RENTAL"];
 const fuelTypes: FuelType[] = ["GASOLINE", "DIESEL", "LPG", "HYBRID", "ELECTRIC"];
@@ -27,6 +30,14 @@ const filters = reactive({
   city: "",
 });
 const page = ref(1);
+
+const sortedListings = computed(() => {
+  return locationStore.sortByProximity(
+    store.listings,
+    (item) => item.location?.coordinates,
+    (item) => item.city,
+  );
+});
 
 async function loadListings(reset = true) {
   if (reset) page.value = 1;
@@ -73,6 +84,9 @@ onMounted(() => loadListings(true));
         {{ t("auto.newListing") }}
       </RouterLink>
     </div>
+
+    <!-- Daangn-style Neighborhood bar for local-first listings -->
+    <NeighborhoodBar class="mt-6" />
 
     <div class="mt-6 flex flex-wrap gap-2">
       <button
@@ -144,7 +158,7 @@ onMounted(() => loadListings(true));
 
     <div v-else>
       <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        <AutoCard v-for="listing in store.listings" :key="listing.id" :listing="listing" />
+        <AutoCard v-for="listing in sortedListings" :key="listing.id" :listing="listing" />
       </div>
 
       <div v-if="store.hasMore" class="mt-6 flex justify-center">

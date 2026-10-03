@@ -7,9 +7,11 @@ import { ArrowLeft } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PhotoUploader from "@/components/common/PhotoUploader.vue";
 import { useMarketplaceStore } from "@/stores/marketplaceStore";
 import type { ContactMethod, ListingCategory, ListingCondition } from "@/types/marketplace";
+import type { GeocodedLocation } from "@/utils/geo";
 
 const { t } = useI18n();
 const router = useRouter();
@@ -18,6 +20,16 @@ const store = useMarketplaceStore();
 const categories: ListingCategory[] = ["ELECTRONICS", "FURNITURE", "BIKES", "CLOTHING", "FOOD", "FREE", "OTHER"];
 const conditions: ListingCondition[] = ["NEW", "USED"];
 const contactMethods: ContactMethod[] = ["PHONE", "CHAT", "KAKAOTALK"];
+
+const selectedCoords = ref<[number, number] | null>(null);
+
+function handleMapLocation(loc: GeocodedLocation) {
+  if (loc.city) form.city = loc.city;
+  else if (loc.name) form.city = loc.name;
+  if (typeof loc.lat === "number" && typeof loc.lon === "number") {
+    selectedCoords.value = [loc.lon, loc.lat];
+  }
+}
 
 const form = reactive({
   category: "ELECTRONICS" as ListingCategory,
@@ -40,6 +52,7 @@ async function handleSubmit() {
       ...form,
       price: Number(form.price) || 0,
       city: form.city || undefined,
+      location: selectedCoords.value ? { type: "Point", coordinates: selectedCoords.value } : undefined,
     });
     router.push(`/marketplace/${listing.id}`);
   } finally {
@@ -95,6 +108,11 @@ async function handleSubmit() {
       </div>
 
       <BaseInput v-model="form.city" :label="t('marketplace.city')" />
+
+      <!-- Interactive Map for pinpointing item location -->
+      <div class="mt-1">
+        <InteractiveMap mode="picker" label="Xaritada mahsulot turgan joyni belgilang (GPS yoki xaritaga bosib)" height="240px" @select="handleMapLocation" />
+      </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>

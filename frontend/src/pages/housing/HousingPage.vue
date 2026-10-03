@@ -1,20 +1,31 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink } from "vue-router";
 import { Plus } from "lucide-vue-next";
 
+import NeighborhoodBar from "@/components/common/NeighborhoodBar.vue";
 import HousingCard from "@/components/housing/HousingCard.vue";
 import { useHousingStore } from "@/stores/housingStore";
+import { useUserLocationStore } from "@/stores/userLocationStore";
 import type { HousingType } from "@/types/housing";
 
 const { t } = useI18n();
 const store = useHousingStore();
+const locationStore = useUserLocationStore();
 
 const types: HousingType[] = ["ONE_ROOM", "TWO_ROOM", "ROOMMATE", "APARTMENT", "COMMERCIAL"];
 const activeType = ref<HousingType | null>(null);
 const filters = reactive({ minDeposit: "", maxDeposit: "", minRent: "", maxRent: "", city: "" });
 const page = ref(1);
+
+const sortedListings = computed(() => {
+  return locationStore.sortByProximity(
+    store.listings,
+    (item) => item.location?.coordinates,
+    (item) => item.city,
+  );
+});
 
 async function loadListings(reset = true) {
   if (reset) page.value = 1;
@@ -58,6 +69,9 @@ onMounted(() => loadListings(true));
         {{ t("housing.newListing") }}
       </RouterLink>
     </div>
+
+    <!-- Daangn-style Neighborhood bar for local-first listings -->
+    <NeighborhoodBar class="mt-6" />
 
     <div class="mt-6 flex flex-wrap gap-2">
       <button
@@ -111,7 +125,7 @@ onMounted(() => loadListings(true));
 
     <div v-else>
       <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        <HousingCard v-for="listing in store.listings" :key="listing.id" :listing="listing" />
+        <HousingCard v-for="listing in sortedListings" :key="listing.id" :listing="listing" />
       </div>
 
       <div v-if="store.hasMore" class="mt-6 flex justify-center">
