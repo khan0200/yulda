@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { LocateFixed, MapPin, Route as RouteIcon } from "lucide-vue-next";
+import { LocateFixed, MapPin, RotateCcw, Route as RouteIcon } from "lucide-vue-next";
 import {
   LngLatBounds,
   Map as MapLibreMap,
@@ -23,6 +23,7 @@ const props = withDefaults(
   defineProps<{
     mode?: "picker" | "route" | "view";
     initialLocation?: Coordinates;
+    initialCoords?: Coordinates;
     routeStops?: Array<{ name: string; lat?: number; lon?: number }>;
     height?: string;
     aspectRatio?: string;
@@ -32,6 +33,7 @@ const props = withDefaults(
   {
     mode: "picker",
     initialLocation: undefined,
+    initialCoords: undefined,
     routeStops: () => [],
     height: undefined,
     aspectRatio: "16/12",
@@ -43,6 +45,8 @@ const props = withDefaults(
 const emit = defineEmits<{
   select: [location: GeocodedLocation];
 }>();
+
+const effectiveLocation = computed(() => props.initialLocation || props.initialCoords);
 
 const containerStyle = computed(() => {
   if (props.height) {
@@ -61,6 +65,7 @@ let map: MapLibreMap | null = null;
 let activeMarker: Marker | null = null;
 let routeMarkers: Marker[] = [];
 let resizeObserver: ResizeObserver | null = null;
+let savedRouteBounds: LngLatBounds | null = null;
 
 const isLocating = ref(false);
 const selectedAddress = ref<string>("");
@@ -286,6 +291,7 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
     // Fit map bounds to show full route
     const bounds = new LngLatBounds();
     validPoints.forEach((pt) => bounds.extend(pt));
+    savedRouteBounds = bounds;
     map.fitBounds(bounds, {
       padding: { top: 80, bottom: 50, left: 60, right: 60 },
       maxZoom: 14,
@@ -294,18 +300,59 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
   }
 }
 
+function handleRecenter() {
+  if (!map) return;
+
+  if (props.mode === "route") {
+    if (savedRouteBounds) {
+      map.fitBounds(savedRouteBounds, {
+        padding: { top: 80, bottom: 50, left: 60, right: 60 },
+        maxZoom: 14,
+        duration: 800,
+      });
+      return;
+    }
+    if (props.routeStops.length >= 2) {
+      renderRoute(props.routeStops);
+      return;
+    }
+  }
+
+  const targetCoords = activeMarker
+    ? { lat: activeMarker.getLngLat().lat, lon: activeMarker.getLngLat().lng }
+    : effectiveLocation.value;
+
+  if (targetCoords) {
+    map.flyTo({
+      center: [targetCoords.lon, targetCoords.lat],
+      zoom: 14,
+      essential: true,
+      duration: 800,
+    });
+    return;
+  }
+
+  // Default: Center of Korea
+  map.flyTo({
+    center: [127.4897, 36.6424],
+    zoom: 7,
+    essential: true,
+    duration: 800,
+  });
+}
+
 onMounted(() => {
   if (!mapContainer.value) return;
 
-  const defaultCenter = props.initialLocation
-    ? [props.initialLocation.lon, props.initialLocation.lat]
+  const defaultCenter = effectiveLocation.value
+    ? [effectiveLocation.value.lon, effectiveLocation.value.lat]
     : [127.4897, 36.6424]; // Center of Korea (Cheongju area)
 
   const instance = new MapLibreMap({
     container: mapContainer.value,
     style: MAP_STYLE,
     center: defaultCenter as [number, number],
-    zoom: props.initialLocation ? 14 : 7,
+    zoom: effectiveLocation.value ? 14 : 7,
     interactive: props.interactive,
     attributionControl: false,
   });
@@ -314,8 +361,8 @@ onMounted(() => {
 
   instance.on("load", () => {
     map = instance;
-    if (props.mode === "picker" && props.initialLocation) {
-      setPickerLocation(props.initialLocation.lat, props.initialLocation.lon, undefined, false);
+    if ((props.mode === "picker" || props.mode === "view") && effectiveLocation.value) {
+      setPickerLocation(effectiveLocation.value.lat, effectiveLocation.value.lon, undefined, false);
     } else if (props.mode === "route" && props.routeStops.length) {
       renderRoute(props.routeStops);
     }
@@ -349,7 +396,7 @@ watch(
 );
 
 watch(
-  () => props.initialLocation,
+  effectiveLocation,
   (newLoc) => {
     if (newLoc && map) {
       map.flyTo({ center: [newLoc.lon, newLoc.lat], zoom: 14 });
@@ -422,6 +469,18 @@ onBeforeUnmount(() => {
         <MapPin class="h-3.5 w-3.5 flex-shrink-0 text-emerald-600" />
         <span class="truncate">{{ selectedAddress }}</span>
       </div>
+    </div>
+
+    <!-- Floating Recenter / Reset View Button (Positioned above + / - zoom buttons) -->
+    <div class="absolute bottom-[86px] right-[10px] z-10">
+      <button
+        type="button"
+        class="group flex h-[32px] w-[32px] items-center justify-center rounded-xl border border-yulda-gray-200 bg-white text-yulda-gray-700 shadow-md transition-all hover:bg-yulda-yellow hover:text-yulda-black hover:scale-105 active:scale-95"
+        title="Markazga keltirish (Masshtabni tiklash)"
+        @click="handleRecenter"
+      >
+        <RotateCcw class="h-4 w-4 transition-transform duration-300 group-hover:-rotate-90" />
+      </button>
     </div>
 
     <!-- Map Canvas Element -->
