@@ -37,7 +37,7 @@ const props = withDefaults(
     initialCoords: undefined,
     routeStops: () => [],
     height: undefined,
-    aspectRatio: "16/12",
+    aspectRatio: "16/10",
     interactive: true,
     label: undefined,
   },
@@ -53,11 +53,11 @@ const containerStyle = computed(() => {
   if (props.height) {
     return { height: props.height };
   }
-  const ratio = (props.aspectRatio || "16/12").replace(":", " / ");
+  const ratio = (props.aspectRatio || "16/10").replace(":", " / ");
   return {
     aspectRatio: ratio,
-    minHeight: "360px",
-    maxHeight: "680px",
+    minHeight: "340px",
+    maxHeight: "620px",
   };
 });
 

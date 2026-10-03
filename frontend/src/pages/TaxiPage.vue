@@ -165,10 +165,10 @@ onMounted(() => runSearch());
 
       <!-- Map route preview for search -->
       <div v-if="searchRouteStops.length >= 2" class="mt-4">
-        <InteractiveMap mode="route" :route-stops="searchRouteStops" label="Qidirilayotgan marshrut xaritasi" aspect-ratio="16/12" />
+        <InteractiveMap mode="route" :route-stops="searchRouteStops" label="Qidirilayotgan marshrut xaritasi" aspect-ratio="16/10" />
       </div>
       <div v-else-if="!searchForm.fromCity" class="mt-4">
-        <InteractiveMap mode="picker" label="Turgan joyingizni tanlang (A nuqta)" aspect-ratio="16/12" @select="handleLocationSelected" />
+        <InteractiveMap mode="picker" label="Turgan joyingizni tanlang (A nuqta)" aspect-ratio="16/10" @select="handleLocationSelected" />
       </div>
 
       <div v-if="store.isLoading" class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -216,7 +216,7 @@ onMounted(() => runSearch());
           <RouteStopsBuilder v-model="postForm.stops" fixed-country="KR" />
           <!-- Map preview of driver route stops -->
           <div v-if="postForm.stops.filter((s) => s.name.trim()).length >= 2" class="mt-3">
-            <InteractiveMap mode="route" :route-stops="postForm.stops" label="Safar marshruti vizualizatsiyasi" aspect-ratio="16/12" />
+            <InteractiveMap mode="route" :route-stops="postForm.stops" label="Safar marshruti vizualizatsiyasi" aspect-ratio="16/10" />
           </div>
         </div>
 
