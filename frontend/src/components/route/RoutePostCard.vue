@@ -1,18 +1,54 @@
 ﻿<script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { Calendar, Car, Clock, MapPin, MessageSquare, Package, Phone, User, Users } from "lucide-vue-next";
+import { Calendar, Car, Check, Clock, Copy, MapPin, MessageSquare, Package, Phone, User, Users } from "lucide-vue-next";
 
 import type { RoutePost } from "@/types/route";
-import { formatDateOnly, formatPriceNote, formatTimeOnly } from "@/utils/format";
+import { formatDateOnly, formatPhoneNumber, formatPriceNote, formatTimeOnly } from "@/utils/format";
 
 const props = defineProps<{ post: RoutePost }>();
 const { t } = useI18n();
+
+const isRevealed = ref(false);
+const isCopied = ref(false);
 
 const routeLabel = computed(() => props.post.stops.map((s) => s.name).join(" → "));
 const isExpired = computed(() => props.post.status === "EXPIRED");
 const dateStr = computed(() => formatDateOnly(props.post.departure_at));
 const timeStr = computed(() => formatTimeOnly(props.post.departure_at));
+const formattedPhone = computed(() => formatPhoneNumber(props.post.contact_phone));
+
+async function handlePhoneClick() {
+  const isMobile = typeof navigator !== "undefined" && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (!isRevealed.value) {
+    isRevealed.value = true;
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(props.post.contact_phone);
+        isCopied.value = true;
+        setTimeout(() => { isCopied.value = false; }, 2500);
+      } catch {
+        // ignore
+      }
+    }
+    if (isMobile) {
+      window.location.href = `tel:${props.post.contact_phone}`;
+    }
+  } else {
+    if (isMobile) {
+      window.location.href = `tel:${props.post.contact_phone}`;
+    } else if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(props.post.contact_phone);
+        isCopied.value = true;
+        setTimeout(() => { isCopied.value = false; }, 2500);
+      } catch {
+        // ignore
+      }
+    }
+  }
+}
 </script>
 
 <template>
@@ -111,13 +147,24 @@ const timeStr = computed(() => formatTimeOnly(props.post.departure_at));
         </div>
       </div>
 
-      <a
-        :href="`tel:${post.contact_phone}`"
-        class="btn-primary !px-4 !py-2 text-xs font-bold shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
+      <!-- Phone Reveal / Call Button -->
+      <button
+        type="button"
+        class="btn-primary !px-3.5 !py-2 text-xs font-bold shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
+        :class="isCopied ? '!bg-emerald-400 !text-black ring-2 ring-emerald-300' : ''"
+        :title="isRevealed ? 'Nusxa olish / Qo\'ng\'iroq qilish' : 'Raqamni ko\'rish'"
+        @click="handlePhoneClick"
       >
         <Phone class="h-3.5 w-3.5" />
-        <span>{{ t("route.call") }}</span>
-      </a>
+        <template v-if="!isRevealed">
+          <span>{{ t("route.call") }}</span>
+        </template>
+        <template v-else>
+          <span class="font-black tracking-wide font-mono text-[11px]">{{ formattedPhone }}</span>
+          <Check v-if="isCopied" class="h-3.5 w-3.5 text-emerald-950" />
+          <Copy v-else class="h-3.5 w-3.5 opacity-70 hover:opacity-100" />
+        </template>
+      </button>
     </div>
   </div>
 </template>

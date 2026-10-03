@@ -59,3 +59,17 @@ export function formatDateTime(isoDate: string | Date | null | undefined): strin
   const min = String(date.getMinutes()).padStart(2, "0");
   return `${y}-${m}-${d} ${h}:${min}`;
 }
+
+export function formatPhoneNumber(phone: string | null | undefined): string {
+  if (!phone) return "";
+  const cleaned = phone.replace(/[^0-9+]/g, "");
+  // Korean standard mobile: 010XXXXXXXX -> 010-XXXX-XXXX
+  if (/^010\d{8}$/.test(cleaned)) {
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 7)}-${cleaned.slice(7)}`;
+  }
+  // Korean 10-digit standard: 0XXXXXXXXX -> 0XX-XXX-XXXX
+  if (/^0\d{9}$/.test(cleaned)) {
+    return `${cleaned.slice(0, 3)}-${cleaned.slice(3, 6)}-${cleaned.slice(6)}`;
+  }
+  return phone;
+}
