@@ -9,6 +9,7 @@ import BaseTextarea from "@/components/common/BaseTextarea.vue";
 import DateTimePicker from "@/components/common/DateTimePicker.vue";
 import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PlaceAutocomplete from "@/components/common/PlaceAutocomplete.vue";
+import PriceInput from "@/components/common/PriceInput.vue";
 import VehicleAutocomplete from "@/components/common/VehicleAutocomplete.vue";
 import RoutePostCard from "@/components/route/RoutePostCard.vue";
 import RouteStopsBuilder from "@/components/route/RouteStopsBuilder.vue";
@@ -249,7 +250,7 @@ onMounted(() => runSearch());
           {{ t("route.hasCargoSpace") }}
         </label>
 
-        <BaseInput v-model="postForm.price_note" :label="t('route.priceNote')" :placeholder="t('route.priceNotePlaceholder')" />
+        <PriceInput v-model="postForm.price_note" :label="t('route.priceNote')" :placeholder="t('route.priceNotePlaceholder')" />
         <BaseTextarea v-model="postForm.notes" :label="t('route.notes')" :placeholder="t('route.notesPlaceholder')" :rows="3" />
         <BaseInput v-model="postForm.contact_phone" :label="t('route.contactPhone')" :placeholder="t('route.contactPhonePlaceholder')" required />
 

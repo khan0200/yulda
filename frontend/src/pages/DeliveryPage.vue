@@ -9,6 +9,7 @@ import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
 import PlaceAutocomplete from "@/components/common/PlaceAutocomplete.vue";
+import PriceInput from "@/components/common/PriceInput.vue";
 import RouteStopsBuilder from "@/components/route/RouteStopsBuilder.vue";
 import { useAuthStore } from "@/stores/authStore";
 import { useCargoStore } from "@/stores/cargoStore";
@@ -203,7 +204,7 @@ onMounted(() => runSearch());
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <BaseInput v-model="postForm.max_weight_kg" type="number" :label="t('cargo.maxWeight')" :placeholder="t('cargo.maxWeightPlaceholder')" />
-          <BaseInput v-model="postForm.price_note" :label="t('cargo.priceNote')" :placeholder="t('cargo.priceNotePlaceholder')" />
+          <PriceInput v-model="postForm.price_note" :label="t('cargo.priceNote')" :placeholder="t('cargo.priceNotePlaceholder')" />
         </div>
 
         <BaseTextarea v-model="postForm.notes" :label="t('cargo.notes')" :placeholder="t('cargo.notesPlaceholder')" :rows="3" />
