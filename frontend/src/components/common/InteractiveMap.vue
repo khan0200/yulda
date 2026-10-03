@@ -284,10 +284,8 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
 
   if (validPoints.length >= 2 && map) {
     const routeData = await fetchOSRMRoute(validPoints);
-    let lineCoordinates: [number, number][] = validPoints;
 
     if (routeData) {
-      lineCoordinates = routeData.coordinates;
       routeInfo.value = {
         distanceKm: routeData.distanceKm,
         durationMin: routeData.durationMin,
@@ -296,6 +294,7 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
       routeInfo.value = null;
     }
 
+    // Direct dashed line between points (A -> B)
     map.addSource("route", {
       type: "geojson",
       data: {
@@ -303,12 +302,12 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
         properties: {},
         geometry: {
           type: "LineString",
-          coordinates: lineCoordinates,
+          coordinates: validPoints,
         },
       },
     });
 
-    // Sleek route line styling with subtle glow casing
+    // Sleek dashed line (- - - - - -) with subtle white casing for contrast
     map.addLayer({
       id: "route-casing",
       type: "line",
@@ -318,9 +317,9 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
         "line-cap": "round",
       },
       paint: {
-        "line-color": "#FFD600",
-        "line-width": 7,
-        "line-opacity": 0.8,
+        "line-color": "#ffffff",
+        "line-width": 6,
+        "line-opacity": 0.9,
       },
     });
 
@@ -334,7 +333,8 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
       },
       paint: {
         "line-color": "#121212",
-        "line-width": 4,
+        "line-width": 3.5,
+        "line-dasharray": [2, 2],
       },
     });
 
