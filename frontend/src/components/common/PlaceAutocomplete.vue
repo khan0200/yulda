@@ -228,7 +228,7 @@ onClickOutside(rootEl, () => {
         @mousedown.prevent="selectPlace(place)"
       >
         <span class="font-medium">{{ place.name }}</span>
-        <span v-if="place.admin1" class="ml-1.5 text-xs text-yulda-gray-400">{{ place.admin1 }}</span>
+        <span v-if="place.admin1 && !/^\d+$/.test(place.admin1.trim()) && place.admin1.trim().toLowerCase() !== place.name.trim().toLowerCase()" class="ml-1.5 text-xs text-yulda-gray-400">{{ place.admin1 }}</span>
       </li>
     </ul>
 
