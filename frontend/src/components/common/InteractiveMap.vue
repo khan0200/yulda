@@ -51,24 +51,24 @@ const isLocating = ref(false);
 const selectedAddress = ref<string>("");
 const routeInfo = ref<{ distanceKm: number; durationMin: number } | null>(null);
 
-// ESRI World Street Map style (Bilingual: English / Latin + Korean Hangul, 100% free, no watermark)
+// OpenStreetMap standard style (100% full coverage in Korea & Uzbekistan, no watermark)
 const MAP_STYLE: StyleSpecification = {
   version: 8,
   sources: {
-    "esri-street-tiles": {
+    "osm-tiles": {
       type: "raster",
       tiles: [
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       ],
       tileSize: 256,
-      attribution: "© Esri, HERE, Garmin, OpenStreetMap contributors",
+      attribution: "© OpenStreetMap contributors",
     },
   },
   layers: [
     {
-      id: "esri-street-layer",
+      id: "osm-tiles-layer",
       type: "raster",
-      source: "esri-street-tiles",
+      source: "osm-tiles",
       minzoom: 0,
       maxzoom: 19,
     },

@@ -265,7 +265,10 @@ onClickOutside(rootEl, () => {
           <!-- Modal Map View -->
           <div class="p-4 flex flex-col gap-2.5">
             <!-- Quick City Shortcut Chips -->
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+            <div
+              class="flex items-center gap-1.5 overflow-x-auto pb-1 [&::-webkit-scrollbar]:hidden"
+              style="scrollbar-width: none; -ms-overflow-style: none;"
+            >
               <span class="text-[11px] font-bold text-yulda-gray-400 uppercase tracking-wider whitespace-nowrap mr-0.5">Tezkor:</span>
               <button
                 v-for="c in POPULAR_SHORTCUTS"
