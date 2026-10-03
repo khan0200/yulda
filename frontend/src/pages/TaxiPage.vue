@@ -163,12 +163,15 @@ onMounted(() => runSearch());
         </BaseButton>
       </div>
 
-      <!-- Map route preview for search -->
-      <div v-if="searchRouteStops.length >= 2" class="mt-4">
-        <InteractiveMap mode="route" :route-stops="searchRouteStops" label="Qidirilayotgan marshrut xaritasi" aspect-ratio="16/10" />
-      </div>
-      <div v-else-if="!searchForm.fromCity" class="mt-4">
-        <InteractiveMap mode="picker" label="Turgan joyingizni tanlang (A nuqta)" aspect-ratio="16/10" @select="handleLocationSelected" />
+      <!-- Map route preview for search (Always visible) -->
+      <div class="mt-4">
+        <InteractiveMap
+          :mode="searchRouteStops.length >= 1 ? 'route' : 'picker'"
+          :route-stops="searchRouteStops"
+          :label="searchRouteStops.length >= 2 ? undefined : searchForm.fromCity ? `A nuqta: ${searchForm.fromCity}` : 'Turgan joyingizni tanlang (A nuqta)'"
+          aspect-ratio="16/10"
+          @select="handleLocationSelected"
+        />
       </div>
 
       <div v-if="store.isLoading" class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">

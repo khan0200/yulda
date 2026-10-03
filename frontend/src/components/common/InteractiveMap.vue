@@ -250,6 +250,24 @@ async function handleUseMyLocation() {
   );
 }
 
+function interpolatePoints(points: [number, number][], stepsPerSegment = 60): [number, number][] {
+  if (points.length < 2) return points;
+  const result: [number, number][] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const p1 = points[i];
+    const p2 = points[i + 1];
+    for (let step = 0; step < stepsPerSegment; step++) {
+      const t = step / stepsPerSegment;
+      result.push([
+        p1[0] + (p2[0] - p1[0]) * t,
+        p1[1] + (p2[1] - p1[1]) * t,
+      ]);
+    }
+  }
+  result.push(points[points.length - 1]);
+  return result;
+}
+
 async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: number }>) {
   if (!map) return;
 
@@ -287,19 +305,20 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
     }
   });
 
+  if (validPoints.length === 1 && map) {
+    savedRouteBounds = null;
+    routeInfo.value = null;
+    map.flyTo({
+      center: validPoints[0],
+      zoom: 12,
+      duration: 800,
+    });
+  }
+
   if (validPoints.length >= 2 && map) {
-    const routeData = await fetchOSRMRoute(validPoints);
+    // 1. Interpolate coordinates so WebGL line-dasharray renders smoothly and reliably
+    const interpolatedCoords = interpolatePoints(validPoints, 60);
 
-    if (routeData) {
-      routeInfo.value = {
-        distanceKm: routeData.distanceKm,
-        durationMin: routeData.durationMin,
-      };
-    } else {
-      routeInfo.value = null;
-    }
-
-    // Direct dashed line between points (A -> B)
     map.addSource("route", {
       type: "geojson",
       data: {
@@ -307,7 +326,7 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
         properties: {},
         geometry: {
           type: "LineString",
-          coordinates: validPoints,
+          coordinates: interpolatedCoords,
         },
       },
     });
@@ -367,6 +386,16 @@ async function renderRoute(stops: Array<{ name: string; lat?: number; lon?: numb
       maxZoom: 14,
       duration: 1000,
     });
+
+    // 2. Fetch OSRM route data for HUD distance & duration in background
+    fetchOSRMRoute(validPoints).then((routeData) => {
+      if (routeData) {
+        routeInfo.value = {
+          distanceKm: routeData.distanceKm,
+          durationMin: routeData.durationMin,
+        };
+      }
+    }).catch(() => {});
   }
 }
 
