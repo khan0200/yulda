@@ -14,7 +14,10 @@ const isExpired = computed(() => props.post.status === "EXPIRED");
 </script>
 
 <template>
-  <div class="card flex flex-col gap-3.5 p-5 transition-all hover:shadow-card-hover" :class="{ 'opacity-60': isExpired }">
+  <div
+    class="card flex flex-col gap-3.5 p-5 shadow-card hover:shadow-card-hover hover:-translate-y-0.5 hover:border-yulda-yellow/50 transition-all duration-200"
+    :class="{ 'opacity-60': isExpired }"
+  >
     <div class="flex items-center justify-between">
       <span
         class="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
@@ -56,7 +59,7 @@ const isExpired = computed(() => props.post.status === "EXPIRED");
 
     <!-- Price note -->
     <div v-if="post.price_note" class="mt-0.5">
-      <span class="inline-block rounded-lg bg-yulda-gray-100 px-2.5 py-1 text-sm font-bold text-yulda-black">
+      <span class="inline-block rounded-lg bg-yulda-gray-100 px-2.5 py-1 text-sm font-bold text-yulda-black border border-yulda-gray-200/60 shadow-xs">
         {{ formatPriceNote(post.price_note) }}
       </span>
     </div>
@@ -66,7 +69,7 @@ const isExpired = computed(() => props.post.status === "EXPIRED");
     <!-- Footer -->
     <div class="mt-1 flex items-center justify-between border-t border-yulda-gray-100 pt-3">
       <span class="text-xs text-yulda-gray-400">{{ t("route.postedBy") }} {{ post.owner.name }}</span>
-      <a :href="`tel:${post.contact_phone}`" class="btn-primary !px-4 !py-2 text-sm">
+      <a :href="`tel:${post.contact_phone}`" class="btn-primary !px-4 !py-2 text-sm shadow-sm hover:shadow-md transition-shadow">
         <Phone class="h-3.5 w-3.5" />
         {{ t("route.call") }}
       </a>
