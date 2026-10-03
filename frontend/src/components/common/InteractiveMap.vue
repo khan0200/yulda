@@ -34,6 +34,7 @@ const props = withDefaults(
     aspectRatio?: string;
     interactive?: boolean;
     label?: string;
+    defaultCenter?: Coordinates;
   }>(),
   {
     mode: "picker",
@@ -44,8 +45,13 @@ const props = withDefaults(
     aspectRatio: "16/10",
     interactive: true,
     label: undefined,
+    defaultCenter: undefined,
   },
 );
+
+// Fallback center when no location/route is given: Center of Korea (Cheongju area)
+const FALLBACK_CENTER: Coordinates = { lat: 36.6424, lon: 127.4897 };
+const mapDefaultCenter = computed(() => props.defaultCenter || FALLBACK_CENTER);
 
 const emit = defineEmits<{
   select: [location: GeocodedLocation];
@@ -127,6 +133,13 @@ const gpsButtonText = computed(() => {
   if (locale.value === "en") return "My Location (GPS)";
   if (locale.value === "ko") return "내 위치 (GPS)";
   return "Mening lokatsiyam (GPS)";
+});
+
+const gpsPrivacyHint = computed(() => {
+  if (locale.value === "ru") return "Будет использована ваша точная GPS-геолокация. Вы сможете скорректировать точку на карте перед отправкой.";
+  if (locale.value === "en") return "Uses your precise GPS location. You can adjust the pin on the map before submitting.";
+  if (locale.value === "ko") return "정확한 GPS 위치를 사용합니다. 제출 전 지도에서 위치를 조정할 수 있습니다.";
+  return "Aniq GPS joylashuvingiz ishlatiladi. Yuborishdan oldin xaritadagi nuqtani surib tuzatishingiz mumkin.";
 });
 
 // OpenStreetMap standard style (100% full coverage in Korea & Uzbekistan, no watermark)
@@ -480,9 +493,9 @@ function handleRecenter() {
     return;
   }
 
-  // Default: Center of Korea
+  // Default: fallback center (Korea, unless defaultCenter prop overrides it)
   map.flyTo({
-    center: [127.4897, 36.6424],
+    center: [mapDefaultCenter.value.lon, mapDefaultCenter.value.lat],
     zoom: 7,
     essential: true,
     duration: 800,
@@ -494,7 +507,7 @@ onMounted(() => {
 
   const defaultCenter = effectiveLocation.value
     ? [effectiveLocation.value.lon, effectiveLocation.value.lat]
-    : [127.4897, 36.6424]; // Center of Korea (Cheongju area)
+    : [mapDefaultCenter.value.lon, mapDefaultCenter.value.lat];
 
   const instance = new MapLibreMap({
     container: mapContainer.value,
@@ -586,6 +599,7 @@ onBeforeUnmount(() => {
         type="button"
         class="flex items-center gap-1.5 rounded-xl bg-yulda-black px-3 py-1.5 text-xs font-semibold text-white shadow-lg transition-transform hover:scale-105 active:scale-95"
         :disabled="isLocating"
+        :title="gpsPrivacyHint"
         @click="handleUseMyLocation"
       >
         <LocateFixed class="h-3.5 w-3.5 text-yulda-yellow" :class="{ 'animate-spin': isLocating }" />

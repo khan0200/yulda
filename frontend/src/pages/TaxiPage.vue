@@ -43,7 +43,12 @@ const searchRouteStops = computed(() => {
 });
 
 function handleLocationSelected(loc: GeocodedLocation) {
-  searchForm.fromCity = loc.city || loc.name;
+  const name = loc.city || loc.name;
+  if (!searchForm.fromCity.trim()) {
+    searchForm.fromCity = name;
+  } else {
+    searchForm.toCity = name;
+  }
 }
 
 async function runSearch() {
@@ -178,7 +183,7 @@ onMounted(() => runSearch());
         <InteractiveMap
           :mode="searchRouteStops.length >= 1 ? 'route' : 'picker'"
           :route-stops="searchRouteStops"
-          :label="searchRouteStops.length >= 2 ? undefined : searchForm.fromCity ? `A nuqta: ${searchForm.fromCity}` : 'Turgan joyingizni tanlang (A nuqta)'"
+          :label="searchRouteStops.length >= 2 ? undefined : searchForm.fromCity ? `A: ${searchForm.fromCity} — endi B nuqtani belgilang` : 'Turgan joyingizni tanlang (A nuqta)'"
           aspect-ratio="16/10"
           @select="handleLocationSelected"
         />
