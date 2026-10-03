@@ -8,6 +8,7 @@ import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
 import InteractiveMap from "@/components/common/InteractiveMap.vue";
 import PlaceAutocomplete from "@/components/common/PlaceAutocomplete.vue";
+import VehicleAutocomplete from "@/components/common/VehicleAutocomplete.vue";
 import RoutePostCard from "@/components/route/RoutePostCard.vue";
 import RouteStopsBuilder from "@/components/route/RouteStopsBuilder.vue";
 import { useAuthStore } from "@/stores/authStore";
@@ -232,7 +233,10 @@ onMounted(() => runSearch());
         <BaseInput v-model="postForm.departure_at" type="datetime-local" :min="todayDatetime" :label="t('route.departureLabel')" required />
 
         <div v-if="postForm.post_type === 'OFFER'" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <BaseInput v-model="postForm.vehicle_info" :label="t('route.vehicleInfo')" :placeholder="t('route.vehicleInfoPlaceholder')" />
+          <div>
+            <label class="label">{{ t('route.vehicleInfo') }}</label>
+            <VehicleAutocomplete v-model="postForm.vehicle_info" :placeholder="t('route.vehicleInfoPlaceholder')" />
+          </div>
           <BaseInput v-model="postForm.seats" type="number" :label="t('route.seats')" />
         </div>
 
