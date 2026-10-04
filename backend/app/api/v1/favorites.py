@@ -26,7 +26,7 @@ async def toggle_favorite(
     user: dict = Depends(get_current_user),
     service: FavoriteService = Depends(get_favorite_service),
 ):
-    result = await service.toggle(user["_id"], target_type.value, target_id)
+    result = await service.toggle(user, target_type.value, target_id)
     return ApiResponse(data=ToggleFavoriteResponse(**result))
 
 

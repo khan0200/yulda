@@ -26,3 +26,4 @@ class ListingStatus(str, Enum):
     ACTIVE = "ACTIVE"
     RESERVED = "RESERVED"
     SOLD = "SOLD"
+    PAUSED = "PAUSED"

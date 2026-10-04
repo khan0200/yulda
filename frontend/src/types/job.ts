@@ -17,6 +17,7 @@ export type JobCategory =
   | "OTHER";
 export type JobPayType = "HOURLY" | "DAILY" | "MONTHLY" | "PER_PROJECT";
 export type JobPostStatus = "ACTIVE" | "CLOSED";
+export type JobContactMethod = "PHONE" | "CHAT";
 
 export interface OwnerSummary {
   id: string;
@@ -38,7 +39,8 @@ export interface JobPost {
   requires_korean: boolean;
   visa_sponsorship: boolean;
   photos: string[];
-  contact_value: string;
+  contact_method: JobContactMethod;
+  contact_value: string | null;
   status: JobPostStatus;
   owner: OwnerSummary;
   like_count: number;

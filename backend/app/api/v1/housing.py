@@ -59,6 +59,35 @@ async def create_listing(
     return ApiResponse(data=HousingPublic.model_validate(listing), message="Listing created")
 
 
+@router.get("/listings/mine", response_model=ApiResponse[PaginatedData[HousingPublic]])
+async def list_my_listings(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=50),
+    user: dict = Depends(get_current_user),
+    service: HousingService = Depends(get_housing_service),
+):
+    items, total = await service.list_my_listings(user, page=page, page_size=page_size)
+    return ApiResponse(
+        data=PaginatedData(
+            items=[HousingPublic.model_validate(item) for item in items],
+            total=total,
+            page=page,
+            page_size=page_size,
+            has_more=page * page_size < total,
+        )
+    )
+
+
+@router.post("/listings/{listing_id}/repost", response_model=ApiResponse[HousingPublic])
+async def repost_listing(
+    listing_id: str,
+    user: dict = Depends(get_current_user),
+    service: HousingService = Depends(get_housing_service),
+):
+    listing = await service.repost_listing(listing_id, user)
+    return ApiResponse(data=HousingPublic.model_validate(listing), message="Listing reposted")
+
+
 @router.get("/listings/{listing_id}", response_model=ApiResponse[HousingPublic])
 async def get_listing(listing_id: str, service: HousingService = Depends(get_housing_service)):
     listing = await service.get_listing(listing_id)

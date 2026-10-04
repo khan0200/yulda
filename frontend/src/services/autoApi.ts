@@ -1,6 +1,14 @@
 import { http } from "@/services/http";
 import type { ApiResponse, PaginatedData } from "@/types/api";
-import type { AccidentHistory, AutoListing, AutoListingType, BodyType, FuelType, TransmissionType } from "@/types/auto";
+import type {
+  AccidentHistory,
+  AutoListing,
+  AutoListingStatus,
+  AutoListingType,
+  BodyType,
+  FuelType,
+  TransmissionType,
+} from "@/types/auto";
 
 export interface ListAutoParams {
   listing_type?: AutoListingType;
@@ -65,6 +73,26 @@ export const autoApi = {
 
   async markSold(listingId: string): Promise<AutoListing> {
     const { data } = await http.patch<ApiResponse<AutoListing>>(`/auto/listings/${listingId}`, { status: "SOLD" });
+    return data.data;
+  },
+
+  async listMine(page = 1, pageSize = 50): Promise<PaginatedData<AutoListing>> {
+    const { data } = await http.get<ApiResponse<PaginatedData<AutoListing>>>("/auto/listings/mine", {
+      params: { page, page_size: pageSize },
+    });
+    return data.data;
+  },
+
+  async repost(listingId: string): Promise<AutoListing> {
+    const { data } = await http.post<ApiResponse<AutoListing>>(`/auto/listings/${listingId}/repost`);
+    return data.data;
+  },
+
+  async updateListing(
+    listingId: string,
+    payload: Partial<{ price: number; description: string; status: AutoListingStatus }>,
+  ): Promise<AutoListing> {
+    const { data } = await http.patch<ApiResponse<AutoListing>>(`/auto/listings/${listingId}`, payload);
     return data.data;
   },
 };

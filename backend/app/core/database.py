@@ -190,11 +190,13 @@ async def _create_indexes(db: AsyncIOMotorDatabase) -> None:
     await db.withdrawals.create_index("status")
 
     await db.conversations.create_index("participant_ids")
+    await db.conversations.create_index("last_message_at")
     await db.messages.create_index("conversation_id")
     await db.messages.create_index("created_at")
+    await db.messages.create_index([("conversation_id", 1), ("sender_id", 1), ("read_at", 1)])
 
     await db.notifications.create_index("user_id")
-    await db.notifications.create_index("read")
+    await db.notifications.create_index("is_read")
     await db.notifications.create_index("created_at")
 
     await db.reviews.create_index("target_id")
@@ -203,7 +205,12 @@ async def _create_indexes(db: AsyncIOMotorDatabase) -> None:
     await db.favorites.create_index([("user_id", 1), ("target_type", 1), ("target_id", 1)], unique=True)
 
     await db.reports.create_index("status")
+    await db.reports.create_index("target_type")
+    await db.reports.create_index("created_at")
     await db.admin_logs.create_index("created_at")
+
+    await db.blocks.create_index([("blocker_id", 1), ("blocked_id", 1)], unique=True)
+    await db.blocks.create_index("blocked_id")
 
     await db.community_posts.create_index("category")
     await db.community_posts.create_index("city")

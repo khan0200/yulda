@@ -3,7 +3,7 @@ import type { GeoPoint } from "@/types/user";
 export type ListingCategory = "ELECTRONICS" | "FURNITURE" | "BIKES" | "CLOTHING" | "FOOD" | "FREE" | "OTHER";
 export type ListingCondition = "NEW" | "USED";
 export type ContactMethod = "PHONE" | "CHAT" | "KAKAOTALK";
-export type ListingStatus = "ACTIVE" | "RESERVED" | "SOLD";
+export type ListingStatus = "ACTIVE" | "RESERVED" | "SOLD" | "PAUSED";
 
 export interface SellerSummary {
   id: string;

@@ -35,6 +35,7 @@ async def test_toggle_favorite_requires_auth(client):
     token = await signup_and_login(client, "owner@example.com", "Owner")
     listing_id = await _create_marketplace_listing(client, token)
 
+    client.cookies.clear()
     response = await client.post(f"/api/v1/favorites/MARKETPLACE/{listing_id}/toggle")
     assert response.status_code == 401
 

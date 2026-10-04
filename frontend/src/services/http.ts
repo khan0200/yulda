@@ -1,11 +1,20 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 
+import { useToastStore } from "@/stores/toastStore";
 import type { ApiErrorBody } from "@/types/api";
 import type { TokenPair } from "@/types/user";
 
 const baseURL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api/v1";
 
 export const http = axios.create({ baseURL });
+
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    /** Set true on a per-request basis to suppress the automatic error toast
+     * (e.g. when the calling form already renders its own inline error). */
+    skipErrorToast?: boolean;
+  }
+}
 
 const ACCESS_TOKEN_KEY = "yulda_access_token";
 const REFRESH_TOKEN_KEY = "yulda_refresh_token";
@@ -69,6 +78,11 @@ http.interceptors.response.use(
         window.location.href = "/login";
         return Promise.reject(refreshError);
       }
+    }
+
+    if (!originalRequest?.skipErrorToast && error.response?.status !== 401) {
+      const message = error.response?.data?.message || "Something went wrong. Please try again.";
+      useToastStore().error(message);
     }
 
     return Promise.reject(error);

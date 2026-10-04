@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink, useRoute, useRouter } from "vue-router";
-import { ArrowLeft, Briefcase, CheckCircle2, MapPin, Trash2 } from "lucide-vue-next";
+import { ArrowLeft, Briefcase, Check, CheckCircle2, Copy, Flag, MapPin, MessageCircle, Phone, Trash2 } from "lucide-vue-next";
 
 import LikeButton from "@/components/common/LikeButton.vue";
+import ReportModal from "@/components/common/ReportModal.vue";
 import { useAuthStore } from "@/stores/authStore";
+import { useConfirmStore } from "@/stores/confirmStore";
+import { useConversationStore } from "@/stores/conversationStore";
 import { useJobStore } from "@/stores/jobStore";
+import { useToastStore } from "@/stores/toastStore";
 import { formatKrw } from "@/utils/format";
 
 const { t } = useI18n();
@@ -14,19 +18,79 @@ const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 const store = useJobStore();
+const confirmStore = useConfirmStore();
+const toast = useToastStore();
+const conversationStore = useConversationStore();
 
 const jobId = computed(() => route.params.id as string);
 const isOwner = computed(() => {
   return Boolean(auth.user && store.currentPost && store.currentPost.owner.id === auth.user.id);
 });
+const showReport = ref(false);
+const isRevealed = ref(false);
+const isCopied = ref(false);
+const isMessaging = ref(false);
+
+async function handlePhoneClick() {
+  const contactValue = store.currentPost?.contact_value;
+  if (!contactValue) return;
+  const isMobile = typeof navigator !== "undefined" && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (!isRevealed.value) {
+    isRevealed.value = true;
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(contactValue);
+        isCopied.value = true;
+        setTimeout(() => { isCopied.value = false; }, 2500);
+      } catch {
+        // ignore
+      }
+    }
+    if (isMobile) window.location.href = `tel:${contactValue}`;
+  } else if (isMobile) {
+    window.location.href = `tel:${contactValue}`;
+  } else if (navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(contactValue);
+      isCopied.value = true;
+      setTimeout(() => { isCopied.value = false; }, 2500);
+    } catch {
+      // ignore
+    }
+  }
+}
+
+async function handleMessageClick() {
+  if (!store.currentPost) return;
+  if (!auth.isAuthenticated) {
+    router.push({ path: "/login", query: { redirect: `/jobs/${jobId.value}` } });
+    return;
+  }
+  if (isMessaging.value) return;
+  isMessaging.value = true;
+  try {
+    const convo = await conversationStore.startConversation({
+      target_user_id: store.currentPost.owner.id,
+      listing_type: "JOBS",
+      listing_id: store.currentPost.id,
+      listing_title: store.currentPost.title,
+    });
+    router.push(`/messages/${convo.id}`);
+  } finally {
+    isMessaging.value = false;
+  }
+}
 const payLabel = computed(() => {
   if (!store.currentPost?.pay_amount || !store.currentPost?.pay_type) return "";
   return `${formatKrw(store.currentPost.pay_amount)} / ${t(`jobs.payType.${store.currentPost.pay_type}`)}`;
 });
 
 async function handleDelete() {
-  if (!confirm(t("jobs.confirmDelete"))) return;
+  const ok = await confirmStore.ask({ message: t("jobs.confirmDelete"), danger: true });
+  if (!ok) return;
   await store.deletePost(jobId.value);
+  toast.success(t("jobs.deleteSuccess"));
   router.push("/jobs");
 }
 
@@ -116,14 +180,50 @@ onMounted(() => store.fetchPost(jobId.value));
               {{ store.currentPost.owner.name.charAt(0) }}
             </div>
             <span>{{ store.currentPost.owner.name }}</span>
+            <button
+              v-if="auth.isAuthenticated && !isOwner"
+              class="ml-auto flex items-center gap-1 text-xs font-medium text-yulda-gray-400 hover:text-red-500"
+              @click="showReport = true"
+            >
+              <Flag class="h-3.5 w-3.5" />
+              {{ t("report.reportButton") }}
+            </button>
           </div>
 
           <div class="mt-4 rounded-xl bg-yulda-gray-50 p-4">
-            <p class="text-xs font-semibold uppercase text-yulda-gray-400">{{ t("jobs.contactValueLabel") }}</p>
-            <p class="mt-1 text-sm font-medium text-yulda-black">{{ store.currentPost.contact_value }}</p>
+            <p class="text-xs font-semibold uppercase text-yulda-gray-400">{{ t("jobs.contactMethodLabel") }}</p>
+            <button
+              v-if="store.currentPost.contact_method === 'PHONE'"
+              type="button"
+              class="btn-primary mt-2 !px-4 !py-2.5 text-sm font-bold flex items-center gap-2"
+              :class="isCopied ? '!bg-emerald-400 !text-black ring-2 ring-emerald-300' : ''"
+              @click="handlePhoneClick"
+            >
+              <Phone class="h-4 w-4" />
+              <template v-if="!isRevealed">
+                <span>{{ t("jobs.call") }}</span>
+              </template>
+              <template v-else>
+                <span class="font-black tracking-wide font-mono text-xs">{{ store.currentPost.contact_value }}</span>
+                <Check v-if="isCopied" class="h-4 w-4 text-emerald-950" />
+                <Copy v-else class="h-4 w-4 opacity-70" />
+              </template>
+            </button>
+            <button
+              v-else
+              type="button"
+              class="btn-primary mt-2 !px-4 !py-2.5 text-sm font-bold flex items-center gap-2"
+              :disabled="isMessaging"
+              @click="handleMessageClick"
+            >
+              <MessageCircle class="h-4 w-4" />
+              <span>{{ t("jobs.sendMessage") }}</span>
+            </button>
           </div>
         </div>
       </div>
     </template>
+
+    <ReportModal v-model:show="showReport" target-type="JOBS" :target-id="jobId" />
   </div>
 </template>

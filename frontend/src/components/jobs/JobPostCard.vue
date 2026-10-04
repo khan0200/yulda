@@ -1,18 +1,24 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { RouterLink } from "vue-router";
-import { Briefcase, Check, Copy, MapPin, Phone, User } from "lucide-vue-next";
+import { RouterLink, useRouter } from "vue-router";
+import { Briefcase, Check, Copy, MapPin, MessageCircle, Phone, User } from "lucide-vue-next";
 
 import LikeButton from "@/components/common/LikeButton.vue";
+import { useAuthStore } from "@/stores/authStore";
+import { useConversationStore } from "@/stores/conversationStore";
 import type { JobPost } from "@/types/job";
 import { formatKrw, formatRelativeTime } from "@/utils/format";
 
 const props = withDefaults(defineProps<{ post: JobPost; liked?: boolean }>(), { liked: false });
 const { t, d } = useI18n();
+const router = useRouter();
+const auth = useAuthStore();
+const conversationStore = useConversationStore();
 
 const isRevealed = ref(false);
 const isCopied = ref(false);
+const isMessaging = ref(false);
 
 const isClosed = computed(() => props.post.status === "CLOSED");
 const relativeTime = computed(() =>
@@ -24,13 +30,15 @@ const payLabel = computed(() => {
 });
 
 async function handlePhoneClick() {
+  const contactValue = props.post.contact_value;
+  if (!contactValue) return;
   const isMobile = typeof navigator !== "undefined" && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
   if (!isRevealed.value) {
     isRevealed.value = true;
     if (navigator.clipboard) {
       try {
-        await navigator.clipboard.writeText(props.post.contact_value);
+        await navigator.clipboard.writeText(contactValue);
         isCopied.value = true;
         setTimeout(() => { isCopied.value = false; }, 2500);
       } catch {
@@ -38,18 +46,38 @@ async function handlePhoneClick() {
       }
     }
     if (isMobile) {
-      window.location.href = `tel:${props.post.contact_value}`;
+      window.location.href = `tel:${contactValue}`;
     }
   } else if (isMobile) {
-    window.location.href = `tel:${props.post.contact_value}`;
+    window.location.href = `tel:${contactValue}`;
   } else if (navigator.clipboard) {
     try {
-      await navigator.clipboard.writeText(props.post.contact_value);
+      await navigator.clipboard.writeText(contactValue);
       isCopied.value = true;
       setTimeout(() => { isCopied.value = false; }, 2500);
     } catch {
       // ignore
     }
+  }
+}
+
+async function handleMessageClick() {
+  if (!auth.isAuthenticated) {
+    router.push({ path: "/login", query: { redirect: `/jobs/${props.post.id}` } });
+    return;
+  }
+  if (isMessaging.value) return;
+  isMessaging.value = true;
+  try {
+    const convo = await conversationStore.startConversation({
+      target_user_id: props.post.owner.id,
+      listing_type: "JOBS",
+      listing_id: props.post.id,
+      listing_title: props.post.title,
+    });
+    router.push(`/messages/${convo.id}`);
+  } finally {
+    isMessaging.value = false;
   }
 }
 </script>
@@ -110,6 +138,7 @@ async function handlePhoneClick() {
       </div>
 
       <button
+        v-if="post.contact_method === 'PHONE'"
         type="button"
         class="btn-primary !px-3.5 !py-2 text-xs font-bold shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
         :class="isCopied ? '!bg-emerald-400 !text-black ring-2 ring-emerald-300' : ''"
@@ -124,6 +153,16 @@ async function handlePhoneClick() {
           <Check v-if="isCopied" class="h-3.5 w-3.5 text-emerald-950" />
           <Copy v-else class="h-3.5 w-3.5 opacity-70 hover:opacity-100" />
         </template>
+      </button>
+      <button
+        v-else
+        type="button"
+        class="btn-primary !px-3.5 !py-2 text-xs font-bold shadow-md transition-all hover:scale-105 active:scale-95 flex items-center gap-1.5"
+        :disabled="isMessaging"
+        @click.stop.prevent="handleMessageClick"
+      >
+        <MessageCircle class="h-3.5 w-3.5" />
+        <span>{{ t("jobs.sendMessage") }}</span>
       </button>
     </div>
   </RouterLink>

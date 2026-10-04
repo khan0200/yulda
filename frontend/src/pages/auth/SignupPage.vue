@@ -50,6 +50,15 @@ async function handleSubmit() {
 
       <TurnstileWidget @verified="(token) => (turnstileToken = token)" @expired="turnstileToken = ''" />
 
+      <i18n-t keypath="auth.agreeToTerms" tag="p" class="text-xs text-yulda-gray-500">
+        <template #terms>
+          <RouterLink to="/terms" class="font-medium text-yulda-black hover:underline">{{ t("footer.terms") }}</RouterLink>
+        </template>
+        <template #privacy>
+          <RouterLink to="/privacy" class="font-medium text-yulda-black hover:underline">{{ t("footer.privacy") }}</RouterLink>
+        </template>
+      </i18n-t>
+
       <p v-if="errorMessage" class="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{{ errorMessage }}</p>
 
       <BaseButton type="submit" full-width :loading="isSubmitting">{{ t("auth.createAccount") }}</BaseButton>

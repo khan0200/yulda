@@ -49,6 +49,35 @@ async def create_post(
     return ApiResponse(data=ServicePostPublic.model_validate(post), message="Service post created")
 
 
+@router.get("/posts/mine", response_model=ApiResponse[PaginatedData[ServicePostPublic]])
+async def list_my_posts(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=50),
+    user: dict = Depends(get_current_user),
+    service: ServicePostService = Depends(get_service_post_service),
+):
+    items, total = await service.list_my_posts(user, page=page, page_size=page_size)
+    return ApiResponse(
+        data=PaginatedData(
+            items=[ServicePostPublic.model_validate(item) for item in items],
+            total=total,
+            page=page,
+            page_size=page_size,
+            has_more=page * page_size < total,
+        )
+    )
+
+
+@router.post("/posts/{service_id}/repost", response_model=ApiResponse[ServicePostPublic])
+async def repost_post(
+    service_id: str,
+    user: dict = Depends(get_current_user),
+    service: ServicePostService = Depends(get_service_post_service),
+):
+    post = await service.repost_post(service_id, user)
+    return ApiResponse(data=ServicePostPublic.model_validate(post), message="Service post reposted")
+
+
 @router.get("/posts/{service_id}", response_model=ApiResponse[ServicePostPublic])
 async def get_post(service_id: str, service: ServicePostService = Depends(get_service_post_service)):
     post = await service.get_post(service_id)

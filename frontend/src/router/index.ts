@@ -141,17 +141,52 @@ const router = createRouter({
       meta: { layout: "public" },
     },
     {
-      path: "/orders",
-      name: "orders",
-      component: () => import("@/pages/PlaceholderPage.vue"),
-      props: { titleKey: "orders.title", subtitleKey: "orders.subtitle" },
-      meta: { layout: "app", requiresAuth: true },
-    },
-    {
       path: "/profile",
       name: "profile",
       component: () => import("@/pages/ProfilePage.vue"),
       meta: { layout: "app", requiresAuth: true },
+    },
+    {
+      path: "/my-listings",
+      name: "my-listings",
+      component: () => import("@/pages/MyListingsPage.vue"),
+      meta: { layout: "app", requiresAuth: true },
+    },
+    {
+      path: "/messages",
+      name: "messages",
+      component: () => import("@/pages/MessagesPage.vue"),
+      meta: { layout: "app", requiresAuth: true },
+    },
+    {
+      path: "/messages/:id",
+      name: "message-thread",
+      component: () => import("@/pages/MessagesPage.vue"),
+      meta: { layout: "app", requiresAuth: true },
+    },
+    {
+      path: "/admin",
+      name: "admin",
+      component: () => import("@/pages/AdminPage.vue"),
+      meta: { layout: "app", requiresAuth: true, requiresAdmin: true },
+    },
+    {
+      path: "/search",
+      name: "search",
+      component: () => import("@/pages/SearchResultsPage.vue"),
+      meta: { layout: "public" },
+    },
+    {
+      path: "/terms",
+      name: "terms",
+      component: () => import("@/pages/legal/TermsPage.vue"),
+      meta: { layout: "public" },
+    },
+    {
+      path: "/privacy",
+      name: "privacy",
+      component: () => import("@/pages/legal/PrivacyPage.vue"),
+      meta: { layout: "public" },
     },
     {
       path: "/:pathMatch(.*)*",
@@ -170,6 +205,10 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
     return { name: "login", query: { redirect: to.fullPath } };
+  }
+
+  if (to.meta.requiresAdmin && !auth.hasRole("ADMIN")) {
+    return { name: "home" };
   }
 
   if (to.meta.guestOnly && auth.isAuthenticated) {

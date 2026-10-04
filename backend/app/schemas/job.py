@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.core.pyobjectid import PyObjectId
-from app.models.job import JobCategory, JobEmploymentType, JobPayType, JobPostStatus, JobPostType
+from app.models.job import JobCategory, JobContactMethod, JobEmploymentType, JobPayType, JobPostStatus, JobPostType
 from app.schemas.common import GeoPoint, OwnerSummary
 
 
@@ -20,7 +20,14 @@ class JobPostCreate(BaseModel):
     requires_korean: bool = False
     visa_sponsorship: bool = False
     photos: list[str] = Field(default_factory=list, max_length=9)
-    contact_value: str = Field(min_length=1, max_length=200)
+    contact_method: JobContactMethod = JobContactMethod.PHONE
+    contact_value: str | None = Field(default=None, max_length=200)
+
+    @model_validator(mode="after")
+    def check_contact_value(self) -> "JobPostCreate":
+        if self.contact_method == JobContactMethod.PHONE and not (self.contact_value and self.contact_value.strip()):
+            raise ValueError("contact_value is required when contact_method is PHONE")
+        return self
 
 
 class JobPostUpdate(BaseModel):
@@ -48,7 +55,8 @@ class JobPostPublic(BaseModel):
     requires_korean: bool = False
     visa_sponsorship: bool = False
     photos: list[str]
-    contact_value: str
+    contact_method: JobContactMethod = JobContactMethod.PHONE
+    contact_value: str | None = None
     status: JobPostStatus
     owner: OwnerSummary
     like_count: int = 0

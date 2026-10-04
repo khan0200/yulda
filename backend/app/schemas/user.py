@@ -62,6 +62,7 @@ class UserPublic(BaseModel):
     roles: list[UserRole]
     verification_status: VerificationStatus
     location: GeoPoint | None = None
+    is_banned: bool = False
     created_at: datetime
     updated_at: datetime
 
@@ -71,3 +72,12 @@ class UserUpdate(BaseModel):
     phone: str | None = Field(default=None, max_length=32)
     avatar: str | None = None
     location: GeoPoint | None = None
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str = Field(min_length=1, max_length=128)
+    new_password: str = Field(min_length=8, max_length=128)
+
+
+class DeleteAccountRequest(BaseModel):
+    password: str = Field(min_length=1, max_length=128)

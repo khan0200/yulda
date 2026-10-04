@@ -24,6 +24,7 @@ export interface User {
   roles: UserRole[];
   verification_status: VerificationStatus;
   location: GeoPoint | null;
+  is_banned: boolean;
   created_at: string;
   updated_at: string;
 }

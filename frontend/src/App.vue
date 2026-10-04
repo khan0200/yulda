@@ -2,6 +2,8 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 
+import ConfirmDialogContainer from "@/components/common/ConfirmDialogContainer.vue";
+import ToastContainer from "@/components/common/ToastContainer.vue";
 import AppLayout from "@/layouts/AppLayout.vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 import PublicLayout from "@/layouts/PublicLayout.vue";
@@ -24,4 +26,6 @@ const layout = computed(() => {
   <component :is="layout">
     <RouterView />
   </component>
+  <ToastContainer />
+  <ConfirmDialogContainer />
 </template>

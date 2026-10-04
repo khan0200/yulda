@@ -22,7 +22,7 @@ export type HousingAmenity =
   | "INTERNET"
   | "PET_FRIENDLY"
   | "HEATING_FLOOR";
-export type HousingStatus = "ACTIVE" | "RESERVED" | "RENTED";
+export type HousingStatus = "ACTIVE" | "RESERVED" | "RENTED" | "PAUSED";
 export type HousingDirection =
   | "NORTH"
   | "NORTHEAST"

@@ -1,6 +1,12 @@
 import { http } from "@/services/http";
 import type { ApiResponse, PaginatedData } from "@/types/api";
-import type { ContactMethod, ListingCategory, ListingCondition, MarketplaceListing } from "@/types/marketplace";
+import type {
+  ContactMethod,
+  ListingCategory,
+  ListingCondition,
+  ListingStatus,
+  MarketplaceListing,
+} from "@/types/marketplace";
 
 export interface ListListingsParams {
   category?: ListingCategory;
@@ -49,6 +55,26 @@ export const marketplaceApi = {
     const { data } = await http.patch<ApiResponse<MarketplaceListing>>(`/marketplace/listings/${listingId}`, {
       status: "SOLD",
     });
+    return data.data;
+  },
+
+  async listMine(page = 1, pageSize = 50): Promise<PaginatedData<MarketplaceListing>> {
+    const { data } = await http.get<ApiResponse<PaginatedData<MarketplaceListing>>>("/marketplace/listings/mine", {
+      params: { page, page_size: pageSize },
+    });
+    return data.data;
+  },
+
+  async repost(listingId: string): Promise<MarketplaceListing> {
+    const { data } = await http.post<ApiResponse<MarketplaceListing>>(`/marketplace/listings/${listingId}/repost`);
+    return data.data;
+  },
+
+  async updateListing(
+    listingId: string,
+    payload: Partial<{ title: string; description: string; price: number; condition: ListingCondition; status: ListingStatus }>,
+  ): Promise<MarketplaceListing> {
+    const { data } = await http.patch<ApiResponse<MarketplaceListing>>(`/marketplace/listings/${listingId}`, payload);
     return data.data;
   },
 };

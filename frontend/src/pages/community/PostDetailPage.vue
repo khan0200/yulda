@@ -2,22 +2,28 @@
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink, useRoute, useRouter } from "vue-router";
-import { ArrowLeft, Trash2 } from "lucide-vue-next";
+import { ArrowLeft, Flag, Trash2 } from "lucide-vue-next";
 
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import ReportModal from "@/components/common/ReportModal.vue";
 import { useAuthStore } from "@/stores/authStore";
 import { useCommunityStore } from "@/stores/communityStore";
+import { useConfirmStore } from "@/stores/confirmStore";
+import { useToastStore } from "@/stores/toastStore";
 
 const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 const store = useCommunityStore();
+const confirmStore = useConfirmStore();
+const toast = useToastStore();
 
 const postId = computed(() => route.params.id as string);
 const commentBody = ref("");
 const isSubmittingComment = ref(false);
+const showReport = ref(false);
 
 const isAuthor = computed(() => {
   return Boolean(auth.user && store.currentPost && store.currentPost.author.id === auth.user.id);
@@ -35,8 +41,10 @@ async function handleAddComment() {
 }
 
 async function handleDelete() {
-  if (!confirm(t("community.confirmDelete"))) return;
+  const ok = await confirmStore.ask({ message: t("community.confirmDelete"), danger: true });
+  if (!ok) return;
   await store.deletePost(postId.value);
+  toast.success(t("community.deleteSuccess"));
   router.push("/community");
 }
 
@@ -73,8 +81,18 @@ onMounted(() => store.fetchPost(postId.value));
           </div>
           <span>{{ store.currentPost.author.name }}</span>
           <span v-if="store.currentPost.city">&middot; {{ store.currentPost.city }}</span>
+          <button
+            v-if="auth.isAuthenticated && !isAuthor"
+            class="ml-auto flex items-center gap-1 text-xs font-medium text-yulda-gray-400 hover:text-red-500"
+            @click="showReport = true"
+          >
+            <Flag class="h-3.5 w-3.5" />
+            {{ t("report.reportButton") }}
+          </button>
         </div>
       </div>
+
+      <ReportModal v-model:show="showReport" target-type="COMMUNITY" :target-id="postId" />
 
       <div class="mt-8">
         <h2 class="text-sm font-semibold text-yulda-black">

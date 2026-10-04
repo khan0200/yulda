@@ -1,6 +1,13 @@
 from enum import Enum
 
 
+class JobContactMethod(str, Enum):
+    PHONE = "PHONE"
+    """Viewer can call/dial the poster's phone number directly."""
+    CHAT = "CHAT"
+    """Viewer can only reach the poster via in-app messaging."""
+
+
 class JobPostType(str, Enum):
     OFFER = "OFFER"
     """Employer posting an open position."""

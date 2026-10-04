@@ -1,6 +1,6 @@
 import { http } from "@/services/http";
 import type { ApiResponse, PaginatedData } from "@/types/api";
-import type { ServiceCategory, ServicePost } from "@/types/service";
+import type { ServiceCategory, ServicePost, ServiceStatus } from "@/types/service";
 
 export interface ListServicesParams {
   category?: ServiceCategory;
@@ -44,6 +44,26 @@ export const serviceApi = {
     const { data } = await http.patch<ApiResponse<ServicePost>>(`/services/posts/${serviceId}`, {
       status: "UNAVAILABLE",
     });
+    return data.data;
+  },
+
+  async listMine(page = 1, pageSize = 50): Promise<PaginatedData<ServicePost>> {
+    const { data } = await http.get<ApiResponse<PaginatedData<ServicePost>>>("/services/posts/mine", {
+      params: { page, page_size: pageSize },
+    });
+    return data.data;
+  },
+
+  async repost(serviceId: string): Promise<ServicePost> {
+    const { data } = await http.post<ApiResponse<ServicePost>>(`/services/posts/${serviceId}/repost`);
+    return data.data;
+  },
+
+  async updatePost(
+    serviceId: string,
+    payload: Partial<{ title: string; description: string; price_note: string; status: ServiceStatus }>,
+  ): Promise<ServicePost> {
+    const { data } = await http.patch<ApiResponse<ServicePost>>(`/services/posts/${serviceId}`, payload);
     return data.data;
   },
 };

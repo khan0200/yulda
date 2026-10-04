@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, timezone
 from typing import Any
 
@@ -62,6 +64,20 @@ class HousingRepository:
                 rent_filter["$lte"] = max_rent
             query["monthly_rent"] = rent_filter
 
+        total = await self._collection.count_documents(query)
+        cursor = (
+            self._collection.find(query)
+            .sort("created_at", -1)
+            .skip((page - 1) * page_size)
+            .limit(page_size)
+        )
+        items = await cursor.to_list(length=page_size)
+        return items, total
+
+    async def list_by_owner(
+        self, owner_id: ObjectId, page: int = 1, page_size: int = 20
+    ) -> tuple[list[dict[str, Any]], int]:
+        query = {"owner_id": owner_id}
         total = await self._collection.count_documents(query)
         cursor = (
             self._collection.find(query)

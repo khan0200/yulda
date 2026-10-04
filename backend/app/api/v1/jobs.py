@@ -57,6 +57,35 @@ async def create_post(
     return ApiResponse(data=JobPostPublic.model_validate(post), message="Job post created")
 
 
+@router.get("/posts/mine", response_model=ApiResponse[PaginatedData[JobPostPublic]])
+async def list_my_posts(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=50),
+    user: dict = Depends(get_current_user),
+    service: JobService = Depends(get_job_service),
+):
+    items, total = await service.list_my_posts(user, page=page, page_size=page_size)
+    return ApiResponse(
+        data=PaginatedData(
+            items=[JobPostPublic.model_validate(item) for item in items],
+            total=total,
+            page=page,
+            page_size=page_size,
+            has_more=page * page_size < total,
+        )
+    )
+
+
+@router.post("/posts/{job_id}/repost", response_model=ApiResponse[JobPostPublic])
+async def repost_post(
+    job_id: str,
+    user: dict = Depends(get_current_user),
+    service: JobService = Depends(get_job_service),
+):
+    post = await service.repost_post(job_id, user)
+    return ApiResponse(data=JobPostPublic.model_validate(post), message="Job post reposted")
+
+
 @router.get("/posts/{job_id}", response_model=ApiResponse[JobPostPublic])
 async def get_post(job_id: str, service: JobService = Depends(get_job_service)):
     post = await service.get_post(job_id)

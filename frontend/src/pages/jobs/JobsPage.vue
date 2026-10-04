@@ -11,7 +11,7 @@ import JobPostCard from "@/components/jobs/JobPostCard.vue";
 import { favoriteApi } from "@/services/favoriteApi";
 import { useAuthStore } from "@/stores/authStore";
 import { useJobStore } from "@/stores/jobStore";
-import type { JobCategory, JobEmploymentType, JobPayType, JobPostType } from "@/types/job";
+import type { JobCategory, JobContactMethod, JobEmploymentType, JobPayType, JobPostType } from "@/types/job";
 
 const { t } = useI18n();
 const auth = useAuthStore();
@@ -68,13 +68,16 @@ const postForm = reactive({
   requires_korean: false,
   visa_sponsorship: false,
   photos: [] as string[],
+  contact_method: "PHONE" as JobContactMethod,
   contact_value: "",
 });
 const isSubmitting = ref(false);
 const submitSuccess = ref(false);
 
 const canSubmit = computed(() => {
-  return postForm.title.trim() && postForm.description.trim() && postForm.contact_value.trim();
+  if (!postForm.title.trim() || !postForm.description.trim()) return false;
+  if (postForm.contact_method === "PHONE") return Boolean(postForm.contact_value.trim());
+  return true;
 });
 
 async function handleSubmit() {
@@ -94,7 +97,8 @@ async function handleSubmit() {
       requires_korean: postForm.requires_korean,
       visa_sponsorship: postForm.visa_sponsorship,
       photos: postForm.photos,
-      contact_value: postForm.contact_value,
+      contact_method: postForm.contact_method,
+      contact_value: postForm.contact_method === "PHONE" ? postForm.contact_value : undefined,
     });
     submitSuccess.value = true;
     postForm.title = "";
@@ -105,6 +109,7 @@ async function handleSubmit() {
     postForm.requires_korean = false;
     postForm.visa_sponsorship = false;
     postForm.photos = [];
+    postForm.contact_method = "PHONE";
     postForm.contact_value = "";
   } finally {
     isSubmitting.value = false;
@@ -274,7 +279,30 @@ onMounted(() => {
           <PhotoUploader v-model="postForm.photos" folder="community" />
         </div>
 
-        <BaseInput v-model="postForm.contact_value" :label="t('jobs.contactValueLabel')" :placeholder="t('jobs.contactValuePlaceholder')" required />
+        <div>
+          <label class="label">{{ t("jobs.contactMethodLabel") }}</label>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="method in (['PHONE', 'CHAT'] as JobContactMethod[])"
+              :key="method"
+              type="button"
+              class="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+              :class="postForm.contact_method === method ? 'bg-yulda-black text-white' : 'bg-yulda-gray-100 text-yulda-gray-600 hover:bg-yulda-gray-200'"
+              @click="postForm.contact_method = method"
+            >
+              {{ t(`jobs.contactMethod.${method}`) }}
+            </button>
+          </div>
+          <p class="mt-1.5 text-xs text-yulda-gray-400">{{ t(`jobs.contactMethodHint.${postForm.contact_method}`) }}</p>
+        </div>
+
+        <BaseInput
+          v-if="postForm.contact_method === 'PHONE'"
+          v-model="postForm.contact_value"
+          :label="t('jobs.contactValueLabel')"
+          :placeholder="t('jobs.contactValuePlaceholder')"
+          required
+        />
 
         <p v-if="submitSuccess" class="rounded-xl bg-green-50 px-4 py-3 text-sm text-green-700">
           {{ t("jobs.publish") }} ✓

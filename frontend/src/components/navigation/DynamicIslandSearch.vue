@@ -11,7 +11,7 @@ const query = ref("");
 function handleSubmit() {
   const trimmed = query.value.trim();
   if (!trimmed) return;
-  router.push({ path: "/marketplace", query: { q: trimmed } });
+  router.push({ path: "/search", query: { q: trimmed } });
 }
 
 function clearSearch() {

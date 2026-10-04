@@ -36,6 +36,7 @@ class HousingStatus(str, Enum):
     ACTIVE = "ACTIVE"
     RESERVED = "RESERVED"
     RENTED = "RENTED"
+    PAUSED = "PAUSED"
 
 
 class HousingDirection(str, Enum):

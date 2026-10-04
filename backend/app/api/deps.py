@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import Depends
+from fastapi import Cookie, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -26,18 +26,22 @@ def get_redis_client() -> Redis:
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    access_token_cookie: str | None = Cookie(default=None, alias="access_token"),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ) -> dict[str, Any]:
-    if credentials is None:
+    token = credentials.credentials if credentials else access_token_cookie
+    if token is None:
         raise UnauthorizedError("Missing authentication credentials")
     try:
-        payload = decode_access_token(credentials.credentials)
+        payload = decode_access_token(token)
     except JWTError as exc:
         raise UnauthorizedError("Invalid or expired access token") from exc
 
     user = await UserRepository(db).find_by_id(payload["sub"])
     if not user:
         raise UnauthorizedError("User no longer exists")
+    if user.get("is_banned"):
+        raise ForbiddenError("Your account has been suspended")
     return user
 
 

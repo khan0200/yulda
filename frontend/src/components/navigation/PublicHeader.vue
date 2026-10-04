@@ -7,6 +7,7 @@ import { Menu, Search, X } from "lucide-vue-next";
 import AppLogo from "@/components/common/AppLogo.vue";
 import LanguageSwitcher from "@/components/common/LanguageSwitcher.vue";
 import DynamicIslandSearch from "@/components/navigation/DynamicIslandSearch.vue";
+import NotificationBell from "@/components/navigation/NotificationBell.vue";
 import { useAuthStore } from "@/stores/authStore";
 
 const { t } = useI18n();
@@ -24,7 +25,7 @@ async function handleLogout() {
 function submitMobileSearch() {
   const trimmed = mobileQuery.value.trim();
   if (!trimmed) return;
-  router.push({ path: "/marketplace", query: { q: trimmed } });
+  router.push({ path: "/search", query: { q: trimmed } });
   mobileSearchOpen.value = false;
   mobileQuery.value = "";
 }
@@ -44,7 +45,8 @@ function submitMobileSearch() {
       <div class="hidden flex-shrink-0 items-center gap-2 md:flex">
         <LanguageSwitcher />
         <template v-if="auth.isAuthenticated">
-          <RouterLink to="/orders" class="btn-ghost">{{ t("nav.orders") }}</RouterLink>
+          <RouterLink to="/messages" class="btn-ghost">{{ t("nav.messages") }}</RouterLink>
+          <NotificationBell />
           <RouterLink to="/profile" class="btn-outline">{{ auth.user?.name }}</RouterLink>
           <button class="btn-ghost" @click="handleLogout">{{ t("nav.logout") }}</button>
         </template>
@@ -58,6 +60,7 @@ function submitMobileSearch() {
         <button class="p-2" :aria-label="t('nav.search')" @click="mobileSearchOpen = !mobileSearchOpen">
           <Search class="h-5 w-5" />
         </button>
+        <NotificationBell v-if="auth.isAuthenticated" />
         <LanguageSwitcher />
         <button class="p-2" @click="mobileOpen = !mobileOpen">
           <Menu v-if="!mobileOpen" class="h-6 w-6" />
@@ -90,7 +93,8 @@ function submitMobileSearch() {
         <RouterLink to="/community" class="rounded-lg px-4 py-3 text-sm font-medium text-yulda-gray-700 hover:bg-yulda-gray-100" @click="mobileOpen = false">{{ t("nav.community") }}</RouterLink>
         <div class="my-2 border-t border-yulda-gray-100" />
         <template v-if="auth.isAuthenticated">
-          <RouterLink to="/orders" class="rounded-lg px-4 py-3 text-sm font-medium hover:bg-yulda-gray-100" @click="mobileOpen = false">{{ t("nav.orders") }}</RouterLink>
+          <RouterLink to="/my-listings" class="rounded-lg px-4 py-3 text-sm font-medium hover:bg-yulda-gray-100" @click="mobileOpen = false">{{ t("profile.myListings") }}</RouterLink>
+          <RouterLink to="/messages" class="rounded-lg px-4 py-3 text-sm font-medium hover:bg-yulda-gray-100" @click="mobileOpen = false">{{ t("nav.messages") }}</RouterLink>
           <RouterLink to="/profile" class="rounded-lg px-4 py-3 text-sm font-medium hover:bg-yulda-gray-100" @click="mobileOpen = false">{{ t("profile.title") }}</RouterLink>
           <button class="rounded-lg px-4 py-3 text-left text-sm font-medium hover:bg-yulda-gray-100" @click="handleLogout">{{ t("nav.logout") }}</button>
         </template>

@@ -1,4 +1,70 @@
 {
+  "common": {
+    "cancel": "Bekor qilish",
+    "confirm": "Tasdiqlash",
+    "save": "Saqlash",
+    "delete": "O'chirish",
+    "close": "Yopish",
+    "loading": "Yuklanmoqda...",
+    "back": "Orqaga",
+    "yes": "Ha",
+    "no": "Yo'q",
+    "submit": "Yuborish",
+    "required": "Majburiy"
+  },
+  "report": {
+    "reportButton": "Shikoyat",
+    "title": "Shikoyat qilish",
+    "reason": "Sabab",
+    "reasons": {
+      "SPAM": "Spam",
+      "SCAM": "Firibgarlik",
+      "INAPPROPRIATE": "Nomaqul kontent",
+      "HARASSMENT": "Xavfsizlikka tahdid",
+      "FAKE_LISTING": "Soxta e'lon",
+      "OTHER": "Boshqa"
+    },
+    "detailsOptional": "Qo'shimcha ma'lumot (ixtiyoriy)",
+    "detailsPlaceholder": "Muammoni tasvirlang...",
+    "submit": "Shikoyatni yuborish",
+    "submitted": "Shikoyatingiz yuborildi. Jamoamiz ko'rib chiqadi."
+  },
+  "block": {
+    "blockUser": "Foydalanuvchini bloklash",
+    "unblockUser": "Blokdan chiqarish",
+    "confirmBlock": "Bu foydalanuvchini bloklaysizmi? U sizga endi yozolmaydi.",
+    "confirmUnblock": "Bu foydalanuvchini blokdan chiqarasizmi?",
+    "blockSuccess": "Foydalanuvchi bloklandi",
+    "unblockSuccess": "Foydalanuvchi blokdan chiqarildi"
+  },
+  "admin": {
+    "title": "Admin",
+    "reportsTab": "Shikoyatlar",
+    "usersTab": "Foydalanuvchilar",
+    "statusAll": "Barchasi",
+    "statusPending": "Kutilmoqda",
+    "statusResolved": "Hal qilindi",
+    "statusDismissed": "Rad etildi",
+    "statusPENDING": "Kutilmoqda",
+    "statusRESOLVED": "Hal qilindi",
+    "statusDISMISSED": "Rad etildi",
+    "noReports": "Shikoyatlar yo'q",
+    "reportedBy": "Shikoyat qildi",
+    "removeContent": "Kontentni o'chirish",
+    "dismiss": "Rad etish",
+    "markResolved": "Hal qilindi deb belgilash",
+    "reportUpdated": "Shikoyat yangilandi",
+    "contentRemoved": "Kontent o'chirildi",
+    "confirmRemoveContent": "Bu kontentni butunlay o'chirasizmi? Bu amalni qaytarib bo'lmaydi.",
+    "searchUsers": "Ism yoki email bo'yicha qidirish...",
+    "search": "Qidirish",
+    "banned": "Bloklangan",
+    "ban": "Bloklash",
+    "unban": "Blokdan chiqarish",
+    "confirmBan": "Bu foydalanuvchini bloklaysizmi? U endi platformadan foydalana olmaydi.",
+    "userBanned": "Foydalanuvchi bloklandi",
+    "userUnbanned": "Foydalanuvchi blokdan chiqarildi"
+  },
   "nav": {
     "taxi": "Taksi",
     "delivery": "Yetkazib berish",
@@ -72,6 +138,7 @@
     "createAccount": "Hisob yaratish",
     "haveAccount": "Hisobingiz bormi?",
     "loginLink": "Kirish",
+    "agreeToTerms": "Hisob yaratish orqali siz bizning {terms} va {privacy}ga roziligingizni bildirasiz.",
     "forgotTitle": "Parolni tiklash",
     "forgotSubtitle": "Elektron pochtangizga parolni tiklash havolasini yuboramiz.",
     "sendResetLink": "Havola yuborish",
@@ -87,7 +154,82 @@
     "roles": "Rollar",
     "verification": "Tasdiqlash",
     "phone": "Telefon",
-    "notSet": "Kiritilmagan"
+    "phonePlaceholder": "010-1234-5678",
+    "notSet": "Kiritilmagan",
+    "myListings": "Mening e'lonlarim",
+    "myListingsDesc": "Barcha joylagan e'lonlaringizni bir joydan boshqaring",
+    "blockedUsers": "Bloklangan foydalanuvchilar",
+    "dangerZone": "Xavfli hudud",
+    "deleteAccountWarning": "Hisobni o'chirish qaytarilmas amal. E'lonlaringiz ko'rinishda qoladi, biroq ularni endi tahrirlab bo'lmaydi.",
+    "deleteAccountPasswordLabel": "Parolingizni tasdiqlang",
+    "deleteAccountButton": "Hisobimni o'chirish",
+    "deleteAccountConfirmTitle": "Hisobni o'chirasizmi?",
+    "deleteAccountConfirmMessage": "Bu amalni qaytarib bo'lmaydi. Hisobingizni o'chirishga ishonchingiz komilmi?",
+    "deleteAccountSuccess": "Hisobingiz o'chirildi",
+    "deleteAccountWrongPassword": "Parol noto'g'ri",
+    "accountInfo": "Akkaunt ma'lumotlari",
+    "name": "Ism",
+    "saveChanges": "O'zgarishlarni saqlash",
+    "updateSuccess": "Profil muvaffaqiyatli yangilandi",
+    "updateFailed": "Profilni yangilab bo'lmadi. Qaytadan urinib ko'ring.",
+    "changePassword": "Parolni o'zgartirish",
+    "currentPassword": "Joriy parol",
+    "newPassword": "Yangi parol",
+    "confirmNewPassword": "Yangi parolni tasdiqlang",
+    "passwordTooShort": "Yangi parol kamida 8 ta belgidan iborat bo'lishi kerak",
+    "passwordMismatch": "Yangi parollar mos kelmadi",
+    "currentPasswordWrong": "Joriy parol noto'g'ri",
+    "passwordChangeSuccess": "Parol muvaffaqiyatli o'zgartirildi"
+  },
+  "notifications": {
+    "title": "Bildirishnomalar",
+    "markAllRead": "Barchasini o'qilgan deb belgilash",
+    "loading": "Yuklanmoqda...",
+    "empty": "Hali bildirishnomalar yo'q",
+    "justNow": "hozir",
+    "minutesShort": "d",
+    "hoursShort": "s",
+    "daysShort": "k"
+  },
+  "messages": {
+    "title": "Xabarlar",
+    "subtitle": "E'lonlaringiz bo'yicha yozishmalar",
+    "noConversations": "Hali yozishmalar yo'q",
+    "selectConversation": "Suhbatni boshlash uchun yozishmani tanlang",
+    "typePlaceholder": "Xabar yozing...",
+    "send": "Yuborish",
+    "loadingMessages": "Xabarlar yuklanmoqda...",
+    "you": "Siz",
+    "about": "E'lon haqida"
+  },
+  "myListings": {
+    "title": "Mening e'lonlarim",
+    "subtitle": "Barcha joylagan e'lonlaringizni bir joydan boshqaring",
+    "empty": "Bu yerda hali hech narsa joylamadingiz",
+    "activate": "Faollashtirish",
+    "deactivate": "To'xtatish",
+    "repost": "Qayta yuqoriga chiqarish",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "confirmDelete": "Ushbu e'lonni butunlay o'chirasizmi?",
+    "confirmRepost": "Ushbu e'lonni bugungi sana bilan yuqoriga chiqarasizmi?",
+    "repostSuccess": "E'lon yuqoriga chiqarildi",
+    "deleteSuccess": "E'lon o'chirildi",
+    "updateSuccess": "E'lon yangilandi",
+    "editTitle": "Sarlavha",
+    "editDescription": "Tavsif",
+    "editPrice": "Narxi"
+  },
+  "search": {
+    "title": "Qidiruv natijalari",
+    "placeholder": "Yulda bo'ylab qidirish...",
+    "marketplaceSection": "Sotaman",
+    "communitySection": "Community",
+    "noResults": "Hech narsa topilmadi",
+    "viewListing": "E'lonni ko'rish",
+    "viewPost": "Postni ko'rish"
   },
   "route": {
     "pageTitle": "Taksi va Poputi",
@@ -239,6 +381,7 @@
     "empty": "Hozircha postlar yo'q. Birinchi bo'lib ulashing!",
     "deletePost": "O'chirish",
     "confirmDelete": "Ushbu postni o'chirasizmi?",
+    "deleteSuccess": "Post o'chirildi",
     "backToFeed": "Lentaga qaytish",
     "loadMore": "Ko'proq ko'rsatish"
   },
@@ -285,6 +428,7 @@
     "empty": "Hozircha e'lonlar yo'q. Birinchi bo'lib biror narsa soting!",
     "deleteListing": "O'chirish",
     "confirmDelete": "Ushbu e'lonni o'chirasizmi?",
+    "deleteSuccess": "E'lon o'chirildi",
     "markSold": "Sotilgan deb belgilash",
     "backToFeed": "Sotaman bo'limiga qaytish",
     "loadMore": "Ko'proq ko'rsatish",
@@ -292,7 +436,8 @@
     "status": {
       "ACTIVE": "Faol",
       "RESERVED": "Band qilingan",
-      "SOLD": "Sotilgan"
+      "SOLD": "Sotilgan",
+      "PAUSED": "To'xtatilgan"
     }
   },
   "housing": {
@@ -353,13 +498,15 @@
     "empty": "Hozircha uy-joy e'lonlari yo'q. Birinchi bo'lib joylang!",
     "deleteListing": "O'chirish",
     "confirmDelete": "Ushbu e'lonni o'chirasizmi?",
+    "deleteSuccess": "E'lon o'chirildi",
     "backToFeed": "Uy-joy bo'limiga qaytish",
     "loadMore": "Ko'proq ko'rsatish",
     "contactOwner": "Egasi bilan bog'lanish",
     "status": {
       "ACTIVE": "Faol",
       "RESERVED": "Band qilingan",
-      "RENTED": "Ijaraga berilgan"
+      "RENTED": "Ijaraga berilgan",
+      "PAUSED": "To'xtatilgan"
     },
     "areaM2": "Maydoni (m²)",
     "roomCount": "Xonalar soni",
@@ -452,6 +599,7 @@
     "empty": "Hozircha mashina e'lonlari yo'q. Birinchi bo'lib joylang!",
     "deleteListing": "O'chirish",
     "confirmDelete": "Ushbu e'lonni o'chirasizmi?",
+    "deleteSuccess": "E'lon o'chirildi",
     "backToFeed": "Avto bo'limiga qaytish",
     "loadMore": "Ko'proq ko'rsatish",
     "contactOwner": "Egasi bilan bog'lanish",
@@ -513,13 +661,24 @@
     "descriptionLabel": "Tavsif",
     "descriptionPlaceholder": "Majburiyatlar, ish jadvali, talablar...",
     "photosLabel": "Rasmlar",
-    "contactValueLabel": "Aloqa ma'lumotlari",
-    "contactValuePlaceholder": "Telefon raqami yoki chat nomi",
+    "contactMethodLabel": "Aloqa usuli",
+    "contactMethod": {
+      "PHONE": "Telefon qo'ng'irog'i",
+      "CHAT": "Faqat ilova ichida xabar"
+    },
+    "contactMethodHint": {
+      "PHONE": "Ko'rganlar telefon raqamingiz bilan qo'ng'iroq qilish tugmasini ko'radi.",
+      "CHAT": "Ko'rganlar sizga faqat Yulda chat orqali yozishi mumkin — telefon raqamingiz maxfiy qoladi."
+    },
+    "contactValueLabel": "Telefon raqami",
+    "contactValuePlaceholder": "Telefon raqami",
+    "sendMessage": "Xabar yuborish",
     "publish": "E'lon qilish",
     "empty": "Hali ish e'lonlari yo'q. Birinchi bo'lib joylang!",
     "noResults": "Mos ish e'loni topilmadi.",
     "deletePost": "O'chirish",
     "confirmDelete": "Ushbu e'lonni o'chirasizmi?",
+    "deleteSuccess": "Ish e'loni o'chirildi",
     "backToFeed": "Ishlarga qaytish",
     "loadMore": "Yana yuklash",
     "call": "Bog'lanish",
@@ -565,6 +724,7 @@
     "noResults": "Mos xizmat topilmadi.",
     "deletePost": "O'chirish",
     "confirmDelete": "Ushbu e'lonni o'chirasizmi?",
+    "deleteSuccess": "Xizmat e'loni o'chirildi",
     "backToFeed": "Xizmatlarga qaytish",
     "loadMore": "Yana yuklash",
     "call": "Bog'lanish",
@@ -580,7 +740,105 @@
     "backHome": "Bosh sahifaga qaytish"
   },
   "footer": {
-    "rights": "Barcha huquqlar himoyalangan."
+    "rights": "Barcha huquqlar himoyalangan.",
+    "terms": "Foydalanish shartlari",
+    "privacy": "Maxfiylik siyosati"
+  },
+  "terms": {
+    "title": "Foydalanish shartlari",
+    "lastUpdated": "Yangilangan: 2026-yil oktyabr",
+    "sections": [
+      {
+        "heading": "1. Shartlarni qabul qilish",
+        "body": "Hisob yaratish yoki Yuldadan foydalanish orqali siz ushbu Foydalanish shartlariga rozilik bildirasiz. Agar rozi bo'lmasangiz, platformadan foydalanmang."
+      },
+      {
+        "heading": "2. Sizning hisobingiz",
+        "body": "Kirish ma'lumotlaringiz xavfsizligi va hisobingiz ostida amalga oshirilgan barcha harakatlar uchun siz javobgarsiz. Ro'yxatdan o'tishda aniq ma'lumot kiritishingiz kerak."
+      },
+      {
+        "heading": "3. E'lonlar va kontent",
+        "body": "Siz joylagan e'lonlar, postlar, xabarlar va boshqa kontent uchun to'liq javobgarsiz. Kontent aniq, qonuniy bo'lishi va boshqalarning huquqlarini buzmasligi kerak."
+      },
+      {
+        "heading": "4. Foydalanuvchilar o'rtasidagi bitimlar",
+        "body": "Yulda — xaridorlar, sotuvchilar, haydovchilar va xizmat ko'rsatuvchilarni bog'laydigan platforma. Biz bitimlarning tomoni emasmiz va e'lonlar, xizmatlar yoki foydalanuvchilarning sifati, xavfsizligi yoki qonuniyligini kafolatlamaymiz."
+      },
+      {
+        "heading": "5. Taqiqlangan harakatlar",
+        "body": "Platformadan firibgarlik, bezorilik, spam, soxta e'lonlar joylash yoki qonunga zid boshqa harakatlar uchun foydalanish mumkin emas. Buzilishlar kontentni o'chirish yoki hisobni bloklashga olib kelishi mumkin."
+      },
+      {
+        "heading": "6. Shikoyatlar va moderatsiya",
+        "body": "Siz ushbu shartlarni buzgan e'lonlar, postlar yoki foydalanuvchilar haqida shikoyat qilishingiz mumkin. Jamoamiz shikoyatlarni ko'rib chiqadi va o'z qarori bilan kontentni o'chirishi, hisoblarni bloklashi yoki o'chirishi mumkin."
+      },
+      {
+        "heading": "7. Hisobni to'xtatish",
+        "body": "Siz istalgan vaqtda profil sozlamalaridan hisobingizni o'chirishingiz mumkin. Biz ushbu shartlarni buzgan hisoblarni to'xtatishimiz yoki o'chirishimiz mumkin."
+      },
+      {
+        "heading": "8. Javobgarlikdan voz kechish",
+        "body": "Yulda hech qanday kafolatsiz, \"bor holida\" taqdim etiladi. Platformadan foydalanish, boshqa foydalanuvchilar bilan muloqot yoki bitimlar natijasida yuzaga kelgan zararlar uchun javobgar emasmiz."
+      },
+      {
+        "heading": "9. Shartlardagi o'zgarishlar",
+        "body": "Biz ushbu Shartlarni vaqti-vaqti bilan yangilashimiz mumkin. O'zgarishlar kuchga kirgandan so'ng platformadan foydalanishni davom ettirish yangilangan shartlarga rozilik bildirish hisoblanadi."
+      },
+      {
+        "heading": "10. Aloqa",
+        "body": "Ushbu Shartlar bo'yicha savollaringiz bo'lsa, ilova orqali qo'llab-quvvatlash xizmatimizga murojaat qiling."
+      }
+    ]
+  },
+  "privacy": {
+    "title": "Maxfiylik siyosati",
+    "lastUpdated": "Yangilangan: 2026-yil oktyabr",
+    "sections": [
+      {
+        "heading": "1. Qanday ma'lumotlarni to'playmiz",
+        "body": "Biz siz bevosita taqdim etgan ma'lumotlarni — ism, email, telefon raqami, shuningdek siz yaratgan e'lonlar va xabarlarni, hamda qurilma va foydalanish haqidagi texnik ma'lumotlarni to'playmiz."
+      },
+      {
+        "heading": "2. Ma'lumotlardan qanday foydalanamiz",
+        "body": "Ma'lumotlaringizdan platformani taqdim etish va yaxshilash, e'lonlar va xabarlarni qayta ishlash, tegishli kontentni ko'rsatish, platforma xavfsizligini ta'minlash va hisobingiz bo'yicha siz bilan bog'lanish uchun foydalanamiz."
+      },
+      {
+        "heading": "3. Joylashuv ma'lumotlari",
+        "body": "Ruxsatingiz bilan yaqin atrofdagi e'lonlarni, taksi/yetkazib berish yo'nalishlarini va tegishli qidiruv natijalarini ko'rsatish uchun taxminiy yoki aniq joylashuvingizdan foydalanishimiz mumkin. Brauzer yoki qurilma sozlamalarida joylashuvga ruxsatni rad etishingiz mumkin."
+      },
+      {
+        "heading": "4. Ma'lumotlarni ulashish",
+        "body": "Biz shaxsiy ma'lumotlaringizni sotmaymiz. Cheklangan ma'lumot (masalan, ismingiz va e'lon tafsilotlari) platformaning odatiy ishlashi doirasida boshqa foydalanuvchilarga ko'rsatiladi."
+      },
+      {
+        "heading": "5. Ma'lumotlar xavfsizligi",
+        "body": "Ma'lumotlaringizni himoya qilish uchun parollarni shifrlash va kirishni nazorat qilish kabi standart choralardan foydalanamiz. Hech qanday tizim 100% xavfsiz bo'lishini kafolatlay olmaymiz."
+      },
+      {
+        "heading": "6. Ma'lumotlarni saqlash va o'chirish",
+        "body": "Hisobingiz faol bo'lgan vaqt davomida ma'lumotlaringizni saqlaymiz. Istalgan vaqtda profil sozlamalaridagi xavfli hudud orqali hisobingiz va shaxsiy ma'lumotlaringizni butunlay o'chirishingiz mumkin."
+      },
+      {
+        "heading": "7. Sizning huquqlaringiz",
+        "body": "Istalgan vaqtda profil ma'lumotlaringizni ko'rish va yangilashingiz, hisobingizni o'chirishni so'rashingiz mumkin. Shaxsiy ma'lumotlaringiz bo'yicha boshqa so'rovlar uchun qo'llab-quvvatlash xizmatiga murojaat qiling."
+      },
+      {
+        "heading": "8. Cookie va mahalliy xotira",
+        "body": "Tizimga kirgan holatingizni saqlash va sozlamalaringizni (masalan, tilni) eslab qolish uchun mahalliy xotira va cookie'lardan foydalanamiz. Uchinchi tomon reklama kuzatuvchilaridan foydalanmaymiz."
+      },
+      {
+        "heading": "9. Bolalar maxfiyligi",
+        "body": "Yulda 14 yoshdan kichik bolalar uchun mo'ljallanmagan. Biz bilarak bolalarning shaxsiy ma'lumotlarini to'plamaymiz."
+      },
+      {
+        "heading": "10. Ushbu siyosatdagi o'zgarishlar",
+        "body": "Biz ushbu Maxfiylik siyosatini vaqti-vaqti bilan yangilashimiz mumkin. Muhim o'zgarishlar haqida foydalanuvchilarni ilova orqali xabardor qilamiz."
+      },
+      {
+        "heading": "11. Aloqa",
+        "body": "Ushbu Maxfiylik siyosati yoki ma'lumotlaringiz qanday ishlatilishi bo'yicha savollaringiz bo'lsa, ilova orqali qo'llab-quvvatlash xizmatimizga murojaat qiling."
+      }
+    ]
   },
   "language": "Til",
   "upload": {

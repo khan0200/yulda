@@ -3,7 +3,37 @@ import { defineStore } from "pinia";
 
 import { authApi, type LoginPayload, type SignupPayload } from "@/services/authApi";
 import { clearTokens, getAccessToken, setTokens } from "@/services/http";
+import { wsClient } from "@/services/wsClient";
+import { useConversationStore } from "@/stores/conversationStore";
+import { useNotificationStore } from "@/stores/notificationStore";
+import type { Message } from "@/types/conversation";
+import type { AppNotification } from "@/types/notification";
 import type { User } from "@/types/user";
+
+let realtimeHandlersRegistered = false;
+
+function connectRealtime(): void {
+  const token = getAccessToken();
+  if (!token) return;
+  wsClient.connect(token);
+
+  if (realtimeHandlersRegistered) return;
+  realtimeHandlersRegistered = true;
+
+  const notificationStore = useNotificationStore();
+  const conversationStore = useConversationStore();
+
+  wsClient.on("notification", (data) => {
+    notificationStore.handleIncoming(data.notification as unknown as AppNotification);
+  });
+
+  wsClient.on("message", (data) => {
+    const conversationId = data.conversation_id as string;
+    const message = data.message as unknown as Message;
+    const isActiveThread = window.location.pathname === `/messages/${conversationId}`;
+    conversationStore.handleIncomingMessage(conversationId, message, isActiveThread);
+  });
+}
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<User | null>(null);
@@ -25,6 +55,7 @@ export const useAuthStore = defineStore("auth", () => {
     isLoading.value = true;
     try {
       user.value = await authApi.me();
+      connectRealtime();
     } catch {
       clearTokens();
       user.value = null;
@@ -40,6 +71,7 @@ export const useAuthStore = defineStore("auth", () => {
       const tokens = await authApi.signup(payload);
       setTokens(tokens);
       user.value = await authApi.me();
+      connectRealtime();
     } finally {
       isLoading.value = false;
     }
@@ -51,18 +83,34 @@ export const useAuthStore = defineStore("auth", () => {
       const tokens = await authApi.login(payload);
       setTokens(tokens);
       user.value = await authApi.me();
+      connectRealtime();
     } finally {
       isLoading.value = false;
     }
   }
 
+  function clearSession(): void {
+    clearTokens();
+    user.value = null;
+    wsClient.disconnect();
+    useNotificationStore().reset();
+    useConversationStore().reset();
+  }
+
   async function logout(): Promise<void> {
     try {
       await authApi.logout();
+    } catch {
+      // Best-effort server-side logout — local state is cleared below
+      // regardless, so a network failure here shouldn't block the user
+      // from being logged out of the app.
     } finally {
-      clearTokens();
-      user.value = null;
+      clearSession();
     }
+  }
+
+  function setUser(updated: User): void {
+    user.value = updated;
   }
 
   return {
@@ -76,5 +124,7 @@ export const useAuthStore = defineStore("auth", () => {
     signup,
     login,
     logout,
+    clearSession,
+    setUser,
   };
 });

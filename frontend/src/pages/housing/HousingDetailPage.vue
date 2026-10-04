@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink, useRoute, useRouter } from "vue-router";
-import { ArrowLeft, CheckCircle2, ImageOff, Trash2 } from "lucide-vue-next";
+import { ArrowLeft, CheckCircle2, Flag, ImageOff, Trash2 } from "lucide-vue-next";
 
 import InteractiveMap from "@/components/common/InteractiveMap.vue";
+import ReportModal from "@/components/common/ReportModal.vue";
 import { useAuthStore } from "@/stores/authStore";
+import { useConfirmStore } from "@/stores/confirmStore";
 import { useHousingStore } from "@/stores/housingStore";
+import { useToastStore } from "@/stores/toastStore";
 import { formatKrw } from "@/utils/format";
 import { getCityCoordinates, type Coordinates } from "@/utils/geo";
 
@@ -15,11 +18,14 @@ const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 const store = useHousingStore();
+const confirmStore = useConfirmStore();
+const toast = useToastStore();
 
 const listingId = computed(() => route.params.id as string);
 const isOwner = computed(() => {
   return Boolean(auth.user && store.currentListing && store.currentListing.owner.id === auth.user.id);
 });
+const showReport = ref(false);
 
 const listingCoords = computed<Coordinates | undefined>(() => {
   if (store.currentListing?.location?.coordinates) {
@@ -33,8 +39,10 @@ const listingCoords = computed<Coordinates | undefined>(() => {
 });
 
 async function handleDelete() {
-  if (!confirm(t("housing.confirmDelete"))) return;
+  const ok = await confirmStore.ask({ message: t("housing.confirmDelete"), danger: true });
+  if (!ok) return;
   await store.deleteListing(listingId.value);
+  toast.success(t("housing.deleteSuccess"));
   router.push("/housing");
 }
 
@@ -156,6 +164,14 @@ onMounted(() => store.fetchListing(listingId.value));
             <span>{{ store.currentListing.owner.name }}</span>
             <span v-if="store.currentListing.metro_station">&middot; {{ store.currentListing.metro_station }}</span>
             <span v-else-if="store.currentListing.city">&middot; {{ store.currentListing.city }}</span>
+            <button
+              v-if="auth.isAuthenticated && !isOwner"
+              class="ml-auto flex items-center gap-1 text-xs font-medium text-yulda-gray-400 hover:text-red-500"
+              @click="showReport = true"
+            >
+              <Flag class="h-3.5 w-3.5" />
+              {{ t("report.reportButton") }}
+            </button>
           </div>
 
           <!-- Interactive Map View -->
@@ -175,5 +191,7 @@ onMounted(() => store.fetchListing(listingId.value));
         </div>
       </div>
     </template>
+
+    <ReportModal v-model:show="showReport" target-type="HOUSING" :target-id="listingId" />
   </div>
 </template>

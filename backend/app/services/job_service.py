@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Any
 
 from motor.motor_asyncio import AsyncIOMotorDatabase
@@ -60,3 +61,14 @@ class JobService:
         post = await self.get_post(job_id)
         assert_can_modify(post, user)
         await self._repo.delete(post["_id"])
+
+    async def list_my_posts(self, user: dict[str, Any], page: int, page_size: int) -> tuple[list[dict[str, Any]], int]:
+        return await self._repo.list_by_owner(user["_id"], page=page, page_size=page_size)
+
+    async def repost_post(self, job_id: str, user: dict[str, Any]) -> dict[str, Any]:
+        post = await self.get_post(job_id)
+        assert_can_modify(post, user)
+        now = datetime.now(timezone.utc)
+        updated = await self._repo.update(post["_id"], {"created_at": now, "status": "ACTIVE"})
+        assert updated is not None
+        return updated

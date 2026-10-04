@@ -1,6 +1,14 @@
 import { http } from "@/services/http";
 import type { ApiResponse, PaginatedData } from "@/types/api";
-import type { JobCategory, JobEmploymentType, JobPayType, JobPost, JobPostType } from "@/types/job";
+import type {
+  JobCategory,
+  JobContactMethod,
+  JobEmploymentType,
+  JobPayType,
+  JobPost,
+  JobPostStatus,
+  JobPostType,
+} from "@/types/job";
 
 export interface ListJobsParams {
   post_type?: JobPostType;
@@ -26,7 +34,8 @@ export interface CreateJobPostPayload {
   requires_korean?: boolean;
   visa_sponsorship?: boolean;
   photos?: string[];
-  contact_value: string;
+  contact_method: JobContactMethod;
+  contact_value?: string;
 }
 
 export const jobApi = {
@@ -51,6 +60,26 @@ export const jobApi = {
 
   async markClosed(jobId: string): Promise<JobPost> {
     const { data } = await http.patch<ApiResponse<JobPost>>(`/jobs/posts/${jobId}`, { status: "CLOSED" });
+    return data.data;
+  },
+
+  async listMine(page = 1, pageSize = 50): Promise<PaginatedData<JobPost>> {
+    const { data } = await http.get<ApiResponse<PaginatedData<JobPost>>>("/jobs/posts/mine", {
+      params: { page, page_size: pageSize },
+    });
+    return data.data;
+  },
+
+  async repost(jobId: string): Promise<JobPost> {
+    const { data } = await http.post<ApiResponse<JobPost>>(`/jobs/posts/${jobId}/repost`);
+    return data.data;
+  },
+
+  async updatePost(
+    jobId: string,
+    payload: Partial<{ title: string; description: string; pay_amount: number; status: JobPostStatus }>,
+  ): Promise<JobPost> {
+    const { data } = await http.patch<ApiResponse<JobPost>>(`/jobs/posts/${jobId}`, payload);
     return data.data;
   },
 };

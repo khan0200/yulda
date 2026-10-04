@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink, useRoute, useRouter } from "vue-router";
-import { ArrowLeft, CheckCircle2, ImageOff, MapPin, Trash2 } from "lucide-vue-next";
+import { ArrowLeft, CheckCircle2, Flag, ImageOff, MapPin, Trash2 } from "lucide-vue-next";
 
 import LikeButton from "@/components/common/LikeButton.vue";
+import ReportModal from "@/components/common/ReportModal.vue";
 import { useAuthStore } from "@/stores/authStore";
+import { useConfirmStore } from "@/stores/confirmStore";
 import { useServiceStore } from "@/stores/serviceStore";
+import { useToastStore } from "@/stores/toastStore";
 import { formatPriceNote } from "@/utils/format";
 
 const { t } = useI18n();
@@ -14,15 +17,20 @@ const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
 const store = useServiceStore();
+const confirmStore = useConfirmStore();
+const toast = useToastStore();
 
 const serviceId = computed(() => route.params.id as string);
 const isOwner = computed(() => {
   return Boolean(auth.user && store.currentPost && store.currentPost.owner.id === auth.user.id);
 });
+const showReport = ref(false);
 
 async function handleDelete() {
-  if (!confirm(t("services.confirmDelete"))) return;
+  const ok = await confirmStore.ask({ message: t("services.confirmDelete"), danger: true });
+  if (!ok) return;
   await store.deletePost(serviceId.value);
+  toast.success(t("services.deleteSuccess"));
   router.push("/services");
 }
 
@@ -100,6 +108,14 @@ onMounted(() => store.fetchPost(serviceId.value));
             <span v-if="store.currentPost.city" class="flex items-center gap-1">
               &middot; <MapPin class="h-3 w-3" /> {{ store.currentPost.city }}
             </span>
+            <button
+              v-if="auth.isAuthenticated && !isOwner"
+              class="ml-auto flex items-center gap-1 text-xs font-medium text-yulda-gray-400 hover:text-red-500"
+              @click="showReport = true"
+            >
+              <Flag class="h-3.5 w-3.5" />
+              {{ t("report.reportButton") }}
+            </button>
           </div>
 
           <div class="mt-4 rounded-xl bg-yulda-gray-50 p-4">
@@ -109,5 +125,7 @@ onMounted(() => store.fetchPost(serviceId.value));
         </div>
       </div>
     </template>
+
+    <ReportModal v-model:show="showReport" target-type="SERVICES" :target-id="serviceId" />
   </div>
 </template>

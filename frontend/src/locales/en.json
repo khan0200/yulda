@@ -1,4 +1,70 @@
 {
+  "common": {
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "close": "Close",
+    "loading": "Loading...",
+    "back": "Back",
+    "yes": "Yes",
+    "no": "No",
+    "submit": "Submit",
+    "required": "Required"
+  },
+  "report": {
+    "reportButton": "Report",
+    "title": "Report",
+    "reason": "Reason",
+    "reasons": {
+      "SPAM": "Spam",
+      "SCAM": "Scam",
+      "INAPPROPRIATE": "Inappropriate content",
+      "HARASSMENT": "Harassment",
+      "FAKE_LISTING": "Fake listing",
+      "OTHER": "Other"
+    },
+    "detailsOptional": "Additional details (optional)",
+    "detailsPlaceholder": "Describe the issue...",
+    "submit": "Submit report",
+    "submitted": "Report submitted. Our team will review it."
+  },
+  "block": {
+    "blockUser": "Block user",
+    "unblockUser": "Unblock user",
+    "confirmBlock": "Block this user? They won't be able to message you anymore.",
+    "confirmUnblock": "Unblock this user?",
+    "blockSuccess": "User blocked",
+    "unblockSuccess": "User unblocked"
+  },
+  "admin": {
+    "title": "Admin",
+    "reportsTab": "Reports",
+    "usersTab": "Users",
+    "statusAll": "All",
+    "statusPending": "Pending",
+    "statusResolved": "Resolved",
+    "statusDismissed": "Dismissed",
+    "statusPENDING": "Pending",
+    "statusRESOLVED": "Resolved",
+    "statusDISMISSED": "Dismissed",
+    "noReports": "No reports to show",
+    "reportedBy": "Reported by",
+    "removeContent": "Remove content",
+    "dismiss": "Dismiss",
+    "markResolved": "Mark resolved",
+    "reportUpdated": "Report updated",
+    "contentRemoved": "Content removed",
+    "confirmRemoveContent": "Permanently remove this content? This cannot be undone.",
+    "searchUsers": "Search by name or email...",
+    "search": "Search",
+    "banned": "Banned",
+    "ban": "Ban",
+    "unban": "Unban",
+    "confirmBan": "Ban this user? They will no longer be able to use the platform.",
+    "userBanned": "User banned",
+    "userUnbanned": "User unbanned"
+  },
   "nav": {
     "taxi": "Taxi",
     "delivery": "Delivery",
@@ -72,6 +138,7 @@
     "createAccount": "Create account",
     "haveAccount": "Already have an account?",
     "loginLink": "Log in",
+    "agreeToTerms": "By creating an account, you agree to our {terms} and {privacy}.",
     "forgotTitle": "Reset your password",
     "forgotSubtitle": "We'll send a reset link to your email.",
     "sendResetLink": "Send reset link",
@@ -87,7 +154,82 @@
     "roles": "Roles",
     "verification": "Verification",
     "phone": "Phone",
-    "notSet": "Not set"
+    "phonePlaceholder": "010-1234-5678",
+    "notSet": "Not set",
+    "myListings": "My Listings",
+    "myListingsDesc": "Manage all your posted listings in one place",
+    "blockedUsers": "Blocked users",
+    "dangerZone": "Danger zone",
+    "deleteAccountWarning": "Deleting your account is permanent and cannot be undone. Your listings will remain visible but will no longer be editable.",
+    "deleteAccountPasswordLabel": "Confirm your password",
+    "deleteAccountButton": "Delete my account",
+    "deleteAccountConfirmTitle": "Delete account?",
+    "deleteAccountConfirmMessage": "This action is permanent. Are you sure you want to delete your account?",
+    "deleteAccountSuccess": "Your account has been deleted",
+    "deleteAccountWrongPassword": "Incorrect password",
+    "accountInfo": "Account info",
+    "name": "Name",
+    "saveChanges": "Save changes",
+    "updateSuccess": "Profile updated successfully",
+    "updateFailed": "Couldn't update profile. Please try again.",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmNewPassword": "Confirm new password",
+    "passwordTooShort": "New password must be at least 8 characters",
+    "passwordMismatch": "New passwords do not match",
+    "currentPasswordWrong": "Current password is incorrect",
+    "passwordChangeSuccess": "Password changed successfully"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "loading": "Loading...",
+    "empty": "No notifications yet",
+    "justNow": "now",
+    "minutesShort": "m",
+    "hoursShort": "h",
+    "daysShort": "d"
+  },
+  "messages": {
+    "title": "Messages",
+    "subtitle": "Conversations about your listings",
+    "noConversations": "No conversations yet",
+    "selectConversation": "Select a conversation to start chatting",
+    "typePlaceholder": "Type a message...",
+    "send": "Send",
+    "loadingMessages": "Loading messages...",
+    "you": "You",
+    "about": "About"
+  },
+  "myListings": {
+    "title": "My Listings",
+    "subtitle": "Manage all your posted listings in one place",
+    "empty": "You haven't posted anything here yet",
+    "activate": "Activate",
+    "deactivate": "Deactivate",
+    "repost": "Repost",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirmDelete": "Delete this listing permanently?",
+    "confirmRepost": "Repost this listing to the top with today's date?",
+    "repostSuccess": "Listing reposted",
+    "updateSuccess": "Listing updated",
+    "deleteSuccess": "Listing deleted",
+    "editTitle": "Title",
+    "editDescription": "Description",
+    "editPrice": "Price"
+  },
+  "search": {
+    "title": "Search results",
+    "placeholder": "Search Yulda...",
+    "marketplaceSection": "For Sale",
+    "communitySection": "Community",
+    "noResults": "No results found",
+    "viewListing": "View listing",
+    "viewPost": "View post"
   },
   "route": {
     "pageTitle": "Taxi & Poputi",
@@ -239,6 +381,7 @@
     "empty": "No posts yet. Be the first to share something!",
     "deletePost": "Delete",
     "confirmDelete": "Delete this post?",
+    "deleteSuccess": "Post deleted",
     "backToFeed": "Back to feed",
     "loadMore": "Load more"
   },
@@ -285,6 +428,7 @@
     "empty": "No listings yet. Be the first to sell something!",
     "deleteListing": "Delete",
     "confirmDelete": "Delete this listing?",
+    "deleteSuccess": "Listing deleted",
     "markSold": "Mark as sold",
     "backToFeed": "Back to marketplace",
     "loadMore": "Load more",
@@ -292,7 +436,8 @@
     "status": {
       "ACTIVE": "Active",
       "RESERVED": "Reserved",
-      "SOLD": "Sold"
+      "SOLD": "Sold",
+      "PAUSED": "Paused"
     }
   },
   "housing": {
@@ -353,13 +498,15 @@
     "empty": "No housing listings yet. Be the first to post one!",
     "deleteListing": "Delete",
     "confirmDelete": "Delete this listing?",
+    "deleteSuccess": "Listing deleted",
     "backToFeed": "Back to housing",
     "loadMore": "Load more",
     "contactOwner": "Contact owner",
     "status": {
       "ACTIVE": "Active",
       "RESERVED": "Reserved",
-      "RENTED": "Rented"
+      "RENTED": "Rented",
+      "PAUSED": "Paused"
     },
     "areaM2": "Area (m²)",
     "roomCount": "Rooms",
@@ -452,6 +599,7 @@
     "empty": "No car listings yet. Be the first to post one!",
     "deleteListing": "Delete",
     "confirmDelete": "Delete this listing?",
+    "deleteSuccess": "Listing deleted",
     "backToFeed": "Back to auto",
     "loadMore": "Load more",
     "contactOwner": "Contact owner",
@@ -513,13 +661,24 @@
     "descriptionLabel": "Description",
     "descriptionPlaceholder": "Responsibilities, schedule, requirements...",
     "photosLabel": "Photos",
-    "contactValueLabel": "Contact details",
-    "contactValuePlaceholder": "Phone number or chat handle",
+    "contactMethodLabel": "Contact method",
+    "contactMethod": {
+      "PHONE": "Phone call",
+      "CHAT": "In-app message only"
+    },
+    "contactMethodHint": {
+      "PHONE": "Viewers will see a call button with your phone number.",
+      "CHAT": "Viewers can only reach you through Yulda chat — your phone number stays private."
+    },
+    "contactValueLabel": "Phone number",
+    "contactValuePlaceholder": "Phone number",
+    "sendMessage": "Send message",
     "publish": "Publish",
     "empty": "No job posts yet. Be the first to post one!",
     "noResults": "No matching job posts found.",
     "deletePost": "Delete",
     "confirmDelete": "Delete this job post?",
+    "deleteSuccess": "Job post deleted",
     "backToFeed": "Back to jobs",
     "loadMore": "Load more",
     "call": "Contact",
@@ -565,6 +724,7 @@
     "noResults": "No matching services found.",
     "deletePost": "Delete",
     "confirmDelete": "Delete this service post?",
+    "deleteSuccess": "Service post deleted",
     "backToFeed": "Back to services",
     "loadMore": "Load more",
     "call": "Contact",
@@ -580,7 +740,105 @@
     "backHome": "Back to home"
   },
   "footer": {
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: October 2026",
+    "sections": [
+      {
+        "heading": "1. Acceptance of Terms",
+        "body": "By creating an account or using Yulda, you agree to these Terms of Service. If you do not agree, please do not use the platform."
+      },
+      {
+        "heading": "2. Your Account",
+        "body": "You are responsible for keeping your login credentials secure and for all activity under your account. You must provide accurate information when signing up."
+      },
+      {
+        "heading": "3. Listings and Content",
+        "body": "You are solely responsible for the listings, posts, messages, and other content you publish. Content must be accurate, lawful, and not infringe on the rights of others."
+      },
+      {
+        "heading": "4. Transactions Between Users",
+        "body": "Yulda is a platform connecting buyers, sellers, drivers, and service providers. We are not a party to any transaction and do not guarantee the quality, safety, or legality of listings, services, or users."
+      },
+      {
+        "heading": "5. Prohibited Activities",
+        "body": "You may not use the platform for fraud, harassment, spam, posting fake or misleading listings, or any activity that violates applicable law. Violations may result in content removal or account suspension."
+      },
+      {
+        "heading": "6. Reporting and Moderation",
+        "body": "You can report listings, posts, or users that violate these terms. Our team reviews reports and may remove content, suspend, or ban accounts at our discretion."
+      },
+      {
+        "heading": "7. Account Termination",
+        "body": "You may delete your account at any time from your profile settings. We may suspend or terminate accounts that violate these terms."
+      },
+      {
+        "heading": "8. Disclaimer of Liability",
+        "body": "Yulda is provided \"as is\" without warranties of any kind. We are not liable for damages arising from your use of the platform, interactions with other users, or any transaction."
+      },
+      {
+        "heading": "9. Changes to These Terms",
+        "body": "We may update these Terms from time to time. Continued use of the platform after changes take effect constitutes acceptance of the revised Terms."
+      },
+      {
+        "heading": "10. Contact",
+        "body": "If you have questions about these Terms, please contact our support team through the app."
+      }
+    ]
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: October 2026",
+    "sections": [
+      {
+        "heading": "1. Information We Collect",
+        "body": "We collect information you provide directly, such as your name, email, phone number, and listings/messages you create, as well as technical data such as device and usage information."
+      },
+      {
+        "heading": "2. How We Use Your Information",
+        "body": "We use your data to provide and improve the platform, process your listings and messages, show relevant content, keep the platform secure, and communicate with you about your account."
+      },
+      {
+        "heading": "3. Location Data",
+        "body": "With your permission, we may use your approximate or precise location to show nearby listings, taxi/delivery routes, and relevant search results. You can decline location access in your browser or device settings."
+      },
+      {
+        "heading": "4. Sharing of Information",
+        "body": "We do not sell your personal data. Limited information (such as your name and listing details) is shown to other users as part of normal platform functionality (e.g., your name on a listing, or in a chat you start)."
+      },
+      {
+        "heading": "5. Data Security",
+        "body": "We use industry-standard measures, including encrypted password storage and access controls, to protect your data. No system is 100% secure, and we cannot guarantee absolute security."
+      },
+      {
+        "heading": "6. Data Retention and Deletion",
+        "body": "We retain your data while your account is active. You can permanently delete your account and personal data at any time from your profile settings' danger zone."
+      },
+      {
+        "heading": "7. Your Rights",
+        "body": "You can access and update your profile information at any time, and request account deletion. Contact support for any other requests regarding your personal data."
+      },
+      {
+        "heading": "8. Cookies and Local Storage",
+        "body": "We use local storage and cookies to keep you logged in and remember your preferences (such as language). We do not use third-party advertising trackers."
+      },
+      {
+        "heading": "9. Children's Privacy",
+        "body": "Yulda is not intended for children under 14. We do not knowingly collect personal data from children."
+      },
+      {
+        "heading": "10. Changes to This Policy",
+        "body": "We may update this Privacy Policy from time to time. We will notify users of significant changes through the app."
+      },
+      {
+        "heading": "11. Contact",
+        "body": "If you have questions about this Privacy Policy or how your data is handled, please contact our support team through the app."
+      }
+    ]
   },
   "language": "Language",
   "upload": {

@@ -1,6 +1,6 @@
 import { http } from "@/services/http";
 import type { ApiResponse, PaginatedData } from "@/types/api";
-import type { HousingAmenity, HousingDirection, HousingListing, HousingType } from "@/types/housing";
+import type { HousingAmenity, HousingDirection, HousingListing, HousingStatus, HousingType } from "@/types/housing";
 
 export interface ListHousingParams {
   housing_type?: HousingType;
@@ -63,6 +63,26 @@ export const housingApi = {
     const { data } = await http.patch<ApiResponse<HousingListing>>(`/housing/listings/${listingId}`, {
       status: "RENTED",
     });
+    return data.data;
+  },
+
+  async listMine(page = 1, pageSize = 50): Promise<PaginatedData<HousingListing>> {
+    const { data } = await http.get<ApiResponse<PaginatedData<HousingListing>>>("/housing/listings/mine", {
+      params: { page, page_size: pageSize },
+    });
+    return data.data;
+  },
+
+  async repost(listingId: string): Promise<HousingListing> {
+    const { data } = await http.post<ApiResponse<HousingListing>>(`/housing/listings/${listingId}/repost`);
+    return data.data;
+  },
+
+  async updateListing(
+    listingId: string,
+    payload: Partial<{ title: string; description: string; deposit: number; monthly_rent: number; status: HousingStatus }>,
+  ): Promise<HousingListing> {
+    const { data } = await http.patch<ApiResponse<HousingListing>>(`/housing/listings/${listingId}`, payload);
     return data.data;
   },
 };

@@ -113,6 +113,63 @@ async def test_only_owner_can_delete_job_post(client):
     assert gone.status_code == 404
 
 
+async def test_create_job_post_defaults_to_phone_contact(client):
+    token = await signup_and_login(client, "phonedefault@example.com", "PhoneDefault")
+    response = await client.post(
+        "/api/v1/jobs/posts",
+        json={
+            "post_type": "OFFER",
+            "category": "RETAIL",
+            "employment_type": "PART_TIME",
+            "title": "Default contact method",
+            "description": "desc",
+            "contact_value": "010-1111-9999",
+        },
+        headers=auth_headers(token),
+    )
+    assert response.status_code == 201
+    body = response.json()["data"]
+    assert body["contact_method"] == "PHONE"
+    assert body["contact_value"] == "010-1111-9999"
+
+
+async def test_create_job_post_with_chat_contact_method(client):
+    token = await signup_and_login(client, "chatcontact@example.com", "ChatContact")
+    response = await client.post(
+        "/api/v1/jobs/posts",
+        json={
+            "post_type": "OFFER",
+            "category": "RETAIL",
+            "employment_type": "PART_TIME",
+            "title": "Message only contact",
+            "description": "desc",
+            "contact_method": "CHAT",
+        },
+        headers=auth_headers(token),
+    )
+    assert response.status_code == 201
+    body = response.json()["data"]
+    assert body["contact_method"] == "CHAT"
+    assert body["contact_value"] is None
+
+
+async def test_create_job_post_phone_method_without_value_rejected(client):
+    token = await signup_and_login(client, "phonemissing@example.com", "PhoneMissing")
+    response = await client.post(
+        "/api/v1/jobs/posts",
+        json={
+            "post_type": "OFFER",
+            "category": "RETAIL",
+            "employment_type": "PART_TIME",
+            "title": "Missing phone",
+            "description": "desc",
+            "contact_method": "PHONE",
+        },
+        headers=auth_headers(token),
+    )
+    assert response.status_code == 422
+
+
 async def test_toggle_favorite_on_job_post(client):
     owner_token = await signup_and_login(client, "jobowner2@example.com", "JobOwner2")
     liker_token = await signup_and_login(client, "jobliker@example.com", "JobLiker")
