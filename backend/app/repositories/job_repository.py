@@ -36,6 +36,8 @@ class JobRepository:
         city: str | None = None,
         requires_korean: bool | None = None,
         visa_sponsorship: bool | None = None,
+        accepted_visa: str | None = None,
+        housing_option: str | None = None,
         status: str | None = "ACTIVE",
         page: int = 1,
         page_size: int = 20,
@@ -53,6 +55,10 @@ class JobRepository:
             query["requires_korean"] = requires_korean
         if visa_sponsorship is not None:
             query["visa_sponsorship"] = visa_sponsorship
+        if accepted_visa:
+            query["accepted_visas"] = accepted_visa
+        if housing_option:
+            query["housing_option"] = housing_option
         if status:
             query["status"] = status
 

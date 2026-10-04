@@ -45,6 +45,33 @@ class JobPayType(str, Enum):
     PER_PROJECT = "PER_PROJECT"
 
 
+class VisaType(str, Enum):
+    """Korean visa categories, as commonly referenced in migrant-worker job ads."""
+
+    E9 = "E9"
+    E7 = "E7"
+    H2 = "H2"
+    F1 = "F1"
+    F2 = "F2"
+    F3 = "F3"
+    F4 = "F4"
+    F5 = "F5"
+    F6 = "F6"
+    D2 = "D2"
+    D4 = "D4"
+    D10 = "D10"
+    G1 = "G1"
+    UNDOCUMENTED = "UNDOCUMENTED"
+    OTHER = "OTHER"
+
+
+class HousingOption(str, Enum):
+    NOT_PROVIDED = "NOT_PROVIDED"
+    PROVIDED_FREE = "PROVIDED_FREE"
+    PROVIDED_PAID = "PROVIDED_PAID"
+    """Housing/dormitory provided but deducted from salary."""
+
+
 class JobPostStatus(str, Enum):
     ACTIVE = "ACTIVE"
     CLOSED = "CLOSED"

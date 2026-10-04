@@ -1,6 +1,7 @@
 import { http } from "@/services/http";
 import type { ApiResponse, PaginatedData } from "@/types/api";
 import type {
+  HousingOption,
   JobCategory,
   JobContactMethod,
   JobEmploymentType,
@@ -8,6 +9,7 @@ import type {
   JobPost,
   JobPostStatus,
   JobPostType,
+  VisaType,
 } from "@/types/job";
 
 export interface ListJobsParams {
@@ -17,6 +19,8 @@ export interface ListJobsParams {
   city?: string;
   requires_korean?: boolean;
   visa_sponsorship?: boolean;
+  accepted_visa?: VisaType;
+  housing_option?: HousingOption;
   page?: number;
   page_size?: number;
 }
@@ -29,10 +33,13 @@ export interface CreateJobPostPayload {
   description: string;
   pay_type?: JobPayType;
   pay_amount?: number;
+  overtime_pay_amount?: number;
   city?: string;
   location?: import("@/types/user").GeoPoint;
   requires_korean?: boolean;
   visa_sponsorship?: boolean;
+  accepted_visas?: VisaType[];
+  housing_option?: HousingOption;
   photos?: string[];
   contact_method: JobContactMethod;
   contact_value?: string;

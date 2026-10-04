@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink, useRoute, useRouter } from "vue-router";
-import { ArrowLeft, Briefcase, Check, CheckCircle2, Copy, Flag, MapPin, MessageCircle, Phone, Trash2 } from "lucide-vue-next";
+import { ArrowLeft, Briefcase, Check, CheckCircle2, Copy, Flag, Home, MapPin, MessageCircle, Phone, Trash2 } from "lucide-vue-next";
 
 import LikeButton from "@/components/common/LikeButton.vue";
 import ReportModal from "@/components/common/ReportModal.vue";
@@ -85,6 +85,10 @@ const payLabel = computed(() => {
   if (!store.currentPost?.pay_amount || !store.currentPost?.pay_type) return "";
   return `${formatKrw(store.currentPost.pay_amount)} / ${t(`jobs.payType.${store.currentPost.pay_type}`)}`;
 });
+const overtimeLabel = computed(() => {
+  if (!store.currentPost?.overtime_pay_amount) return "";
+  return `${t("jobs.overtimePayAmount")}: ${formatKrw(store.currentPost.overtime_pay_amount)}`;
+});
 
 async function handleDelete() {
   const ok = await confirmStore.ask({ message: t("jobs.confirmDelete"), danger: true });
@@ -152,6 +156,7 @@ onMounted(() => store.fetchPost(jobId.value));
           </div>
 
           <p v-if="payLabel" class="mt-3 text-2xl font-extrabold text-yulda-black">{{ payLabel }}</p>
+          <p v-if="overtimeLabel" class="mt-1 text-sm font-semibold text-yulda-gray-500">{{ overtimeLabel }}</p>
 
           <span
             v-if="store.currentPost.status !== 'ACTIVE'"
@@ -168,9 +173,26 @@ onMounted(() => store.fetchPost(jobId.value));
             <span v-if="store.currentPost.requires_korean" class="rounded-lg bg-yulda-gray-100 px-2 py-0.5 text-[11px] font-semibold text-yulda-gray-600">
               {{ t("jobs.requiresKorean") }}
             </span>
+            <span v-if="store.currentPost.housing_option !== 'NOT_PROVIDED'" class="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 ring-1 ring-blue-200">
+              <Home class="h-3 w-3" />
+              {{ t(`jobs.housingOption.${store.currentPost.housing_option}`) }}
+            </span>
             <span v-if="store.currentPost.visa_sponsorship" class="rounded-lg bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
               {{ t("jobs.visaSponsorship") }}
             </span>
+          </div>
+
+          <div v-if="store.currentPost.accepted_visas.length" class="mt-3">
+            <p class="text-xs font-semibold uppercase text-yulda-gray-400">{{ t("jobs.acceptedVisasLabel") }}</p>
+            <div class="mt-1.5 flex flex-wrap gap-1.5">
+              <span
+                v-for="visa in store.currentPost.accepted_visas"
+                :key="visa"
+                class="rounded-lg bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-200"
+              >
+                {{ t(`jobs.visaType.${visa}`) }}
+              </span>
+            </div>
           </div>
 
           <p class="mt-4 whitespace-pre-wrap text-sm text-yulda-gray-700">{{ store.currentPost.description }}</p>

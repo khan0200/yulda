@@ -170,6 +170,121 @@ async def test_create_job_post_phone_method_without_value_rejected(client):
     assert response.status_code == 422
 
 
+async def test_create_job_post_with_visa_housing_overtime(client):
+    token = await signup_and_login(client, "visajob@example.com", "VisaJob")
+    response = await client.post(
+        "/api/v1/jobs/posts",
+        json={
+            "post_type": "OFFER",
+            "category": "CONSTRUCTION_FACTORY",
+            "employment_type": "FULL_TIME",
+            "title": "Factory packing work",
+            "description": "desc",
+            "pay_type": "MONTHLY",
+            "pay_amount": 2400000,
+            "overtime_pay_amount": 12000,
+            "accepted_visas": ["H2", "F4", "F5"],
+            "housing_option": "PROVIDED_PAID",
+            "contact_value": "010-1111-2222",
+        },
+        headers=auth_headers(token),
+    )
+    assert response.status_code == 201
+    body = response.json()["data"]
+    assert body["overtime_pay_amount"] == 12000
+    assert set(body["accepted_visas"]) == {"H2", "F4", "F5"}
+    assert body["housing_option"] == "PROVIDED_PAID"
+
+
+async def test_job_post_defaults_for_visa_and_housing(client):
+    token = await signup_and_login(client, "defaultvisa@example.com", "DefaultVisa")
+    response = await client.post(
+        "/api/v1/jobs/posts",
+        json={
+            "post_type": "OFFER",
+            "category": "RETAIL",
+            "employment_type": "PART_TIME",
+            "title": "No visa info given",
+            "description": "desc",
+            "contact_value": "010-1111-2222",
+        },
+        headers=auth_headers(token),
+    )
+    body = response.json()["data"]
+    assert body["accepted_visas"] == []
+    assert body["housing_option"] == "NOT_PROVIDED"
+    assert body["overtime_pay_amount"] is None
+
+
+async def test_filter_jobs_by_accepted_visa(client):
+    token = await signup_and_login(client, "visafilter@example.com", "VisaFilter")
+    await client.post(
+        "/api/v1/jobs/posts",
+        json={
+            "post_type": "OFFER",
+            "category": "CONSTRUCTION_FACTORY",
+            "employment_type": "FULL_TIME",
+            "title": "D2 friendly job",
+            "description": "desc",
+            "accepted_visas": ["D2", "G1"],
+            "contact_value": "010-1111-2222",
+        },
+        headers=auth_headers(token),
+    )
+    await client.post(
+        "/api/v1/jobs/posts",
+        json={
+            "post_type": "OFFER",
+            "category": "CONSTRUCTION_FACTORY",
+            "employment_type": "FULL_TIME",
+            "title": "E9 only job",
+            "description": "desc",
+            "accepted_visas": ["E9"],
+            "contact_value": "010-1111-2222",
+        },
+        headers=auth_headers(token),
+    )
+
+    response = await client.get("/api/v1/jobs/posts", params={"accepted_visa": "D2"})
+    data = response.json()["data"]
+    assert data["total"] == 1
+    assert data["items"][0]["title"] == "D2 friendly job"
+
+
+async def test_filter_jobs_by_housing_option(client):
+    token = await signup_and_login(client, "housingfilter@example.com", "HousingFilter")
+    await client.post(
+        "/api/v1/jobs/posts",
+        json={
+            "post_type": "OFFER",
+            "category": "CONSTRUCTION_FACTORY",
+            "employment_type": "FULL_TIME",
+            "title": "Free dorm job",
+            "description": "desc",
+            "housing_option": "PROVIDED_FREE",
+            "contact_value": "010-1111-2222",
+        },
+        headers=auth_headers(token),
+    )
+    await client.post(
+        "/api/v1/jobs/posts",
+        json={
+            "post_type": "OFFER",
+            "category": "CONSTRUCTION_FACTORY",
+            "employment_type": "FULL_TIME",
+            "title": "No housing job",
+            "description": "desc",
+            "contact_value": "010-1111-2222",
+        },
+        headers=auth_headers(token),
+    )
+
+    response = await client.get("/api/v1/jobs/posts", params={"housing_option": "PROVIDED_FREE"})
+    data = response.json()["data"]
+    assert data["total"] == 1
+    assert data["items"][0]["title"] == "Free dorm job"
+
+
 async def test_toggle_favorite_on_job_post(client):
     owner_token = await signup_and_login(client, "jobowner2@example.com", "JobOwner2")
     liker_token = await signup_and_login(client, "jobliker@example.com", "JobLiker")

@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { RouterLink, useRouter } from "vue-router";
-import { Briefcase, Check, Copy, MapPin, MessageCircle, Phone, User } from "lucide-vue-next";
+import { Briefcase, Check, Copy, Home, MapPin, MessageCircle, Phone, User } from "lucide-vue-next";
 
 import LikeButton from "@/components/common/LikeButton.vue";
 import { useAuthStore } from "@/stores/authStore";
@@ -28,6 +28,12 @@ const payLabel = computed(() => {
   if (!props.post.pay_amount || !props.post.pay_type) return "";
   return `${formatKrw(props.post.pay_amount)} / ${t(`jobs.payType.${props.post.pay_type}`)}`;
 });
+const overtimeLabel = computed(() => {
+  if (!props.post.overtime_pay_amount) return "";
+  return `${t("jobs.overtimeShort")}: ${formatKrw(props.post.overtime_pay_amount)}`;
+});
+const visibleVisas = computed(() => props.post.accepted_visas.slice(0, 3));
+const extraVisaCount = computed(() => Math.max(0, props.post.accepted_visas.length - 3));
 
 async function handlePhoneClick() {
   const contactValue = props.post.contact_value;
@@ -113,18 +119,31 @@ async function handleMessageClick() {
         </div>
       </div>
 
-      <p v-if="payLabel" class="text-base font-extrabold text-yulda-black">{{ payLabel }}</p>
+      <div class="flex flex-wrap items-baseline gap-x-2">
+        <p v-if="payLabel" class="text-base font-extrabold text-yulda-black">{{ payLabel }}</p>
+        <p v-if="overtimeLabel" class="text-xs font-semibold text-yulda-gray-500">{{ overtimeLabel }}</p>
+      </div>
 
       <div class="flex flex-wrap items-center gap-1.5">
         <span v-if="post.city" class="inline-flex items-center gap-1 rounded-xl border border-yulda-gray-200 bg-yulda-gray-50/80 px-2.5 py-1 text-xs font-semibold text-yulda-gray-800">
           <MapPin class="h-3 w-3 text-yulda-gray-500" />
           {{ post.city }}
         </span>
+        <span v-if="post.housing_option !== 'NOT_PROVIDED'" class="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 ring-1 ring-blue-200">
+          <Home class="h-3 w-3" />
+          {{ t(`jobs.housingOption.${post.housing_option}`) }}
+        </span>
         <span v-if="post.requires_korean" class="rounded-lg bg-yulda-gray-100 px-2 py-0.5 text-[11px] font-semibold text-yulda-gray-600">
           {{ t("jobs.requiresKorean") }}
         </span>
         <span v-if="post.visa_sponsorship" class="rounded-lg bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200">
           {{ t("jobs.visaSponsorship") }}
+        </span>
+        <span v-for="visa in visibleVisas" :key="visa" class="rounded-lg bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800 ring-1 ring-amber-200">
+          {{ visa }}
+        </span>
+        <span v-if="extraVisaCount > 0" class="rounded-lg bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800 ring-1 ring-amber-200">
+          +{{ extraVisaCount }}
         </span>
       </div>
     </div>

@@ -35,6 +35,8 @@ class JobService:
         city: str | None,
         requires_korean: bool | None,
         visa_sponsorship: bool | None,
+        accepted_visa: str | None,
+        housing_option: str | None,
         page: int,
         page_size: int,
     ) -> tuple[list[dict[str, Any]], int]:
@@ -45,6 +47,8 @@ class JobService:
             city=city,
             requires_korean=requires_korean,
             visa_sponsorship=visa_sponsorship,
+            accepted_visa=accepted_visa,
+            housing_option=housing_option,
             page=page,
             page_size=page_size,
         )

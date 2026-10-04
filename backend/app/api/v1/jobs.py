@@ -3,7 +3,7 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 
 from app.api.deps import get_current_user, get_db
 from app.core.responses import ApiResponse, PaginatedData
-from app.models.job import JobCategory, JobEmploymentType, JobPostType
+from app.models.job import HousingOption, JobCategory, JobEmploymentType, JobPostType, VisaType
 from app.schemas.job import JobPostCreate, JobPostPublic, JobPostUpdate
 from app.services.job_service import JobService
 
@@ -22,6 +22,8 @@ async def list_posts(
     city: str | None = None,
     requires_korean: bool | None = None,
     visa_sponsorship: bool | None = None,
+    accepted_visa: VisaType | None = None,
+    housing_option: HousingOption | None = None,
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=50),
     service: JobService = Depends(get_job_service),
@@ -33,6 +35,8 @@ async def list_posts(
         city=city,
         requires_korean=requires_korean,
         visa_sponsorship=visa_sponsorship,
+        accepted_visa=accepted_visa.value if accepted_visa else None,
+        housing_option=housing_option.value if housing_option else None,
         page=page,
         page_size=page_size,
     )

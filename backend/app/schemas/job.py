@@ -3,7 +3,16 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.core.pyobjectid import PyObjectId
-from app.models.job import JobCategory, JobContactMethod, JobEmploymentType, JobPayType, JobPostStatus, JobPostType
+from app.models.job import (
+    HousingOption,
+    JobCategory,
+    JobContactMethod,
+    JobEmploymentType,
+    JobPayType,
+    JobPostStatus,
+    JobPostType,
+    VisaType,
+)
 from app.schemas.common import GeoPoint, OwnerSummary
 
 
@@ -15,10 +24,13 @@ class JobPostCreate(BaseModel):
     description: str = Field(min_length=1, max_length=5000)
     pay_type: JobPayType | None = None
     pay_amount: int | None = Field(default=None, ge=0, le=1_000_000_000)
+    overtime_pay_amount: int | None = Field(default=None, ge=0, le=1_000_000_000)
     city: str | None = Field(default=None, max_length=100)
     location: GeoPoint | None = None
     requires_korean: bool = False
     visa_sponsorship: bool = False
+    accepted_visas: list[VisaType] = Field(default_factory=list, max_length=len(VisaType))
+    housing_option: HousingOption = HousingOption.NOT_PROVIDED
     photos: list[str] = Field(default_factory=list, max_length=9)
     contact_method: JobContactMethod = JobContactMethod.PHONE
     contact_value: str | None = Field(default=None, max_length=200)
@@ -35,6 +47,9 @@ class JobPostUpdate(BaseModel):
     description: str | None = Field(default=None, min_length=1, max_length=5000)
     pay_type: JobPayType | None = None
     pay_amount: int | None = Field(default=None, ge=0, le=1_000_000_000)
+    overtime_pay_amount: int | None = Field(default=None, ge=0, le=1_000_000_000)
+    accepted_visas: list[VisaType] | None = Field(default=None, max_length=len(VisaType))
+    housing_option: HousingOption | None = None
     photos: list[str] | None = Field(default=None, max_length=9)
     status: JobPostStatus | None = None
 
@@ -50,10 +65,13 @@ class JobPostPublic(BaseModel):
     description: str
     pay_type: JobPayType | None = None
     pay_amount: int | None = None
+    overtime_pay_amount: int | None = None
     city: str | None = None
     location: GeoPoint | None = None
     requires_korean: bool = False
     visa_sponsorship: bool = False
+    accepted_visas: list[VisaType] = Field(default_factory=list)
+    housing_option: HousingOption = HousingOption.NOT_PROVIDED
     photos: list[str]
     contact_method: JobContactMethod = JobContactMethod.PHONE
     contact_value: str | None = None

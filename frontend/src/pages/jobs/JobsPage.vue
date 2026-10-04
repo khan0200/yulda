@@ -6,12 +6,21 @@ import { Briefcase, Search } from "lucide-vue-next";
 import BaseButton from "@/components/common/BaseButton.vue";
 import BaseInput from "@/components/common/BaseInput.vue";
 import BaseTextarea from "@/components/common/BaseTextarea.vue";
+import MultiSelectDropdown from "@/components/common/MultiSelectDropdown.vue";
 import PhotoUploader from "@/components/common/PhotoUploader.vue";
 import JobPostCard from "@/components/jobs/JobPostCard.vue";
 import { favoriteApi } from "@/services/favoriteApi";
 import { useAuthStore } from "@/stores/authStore";
 import { useJobStore } from "@/stores/jobStore";
-import type { JobCategory, JobContactMethod, JobEmploymentType, JobPayType, JobPostType } from "@/types/job";
+import type {
+  HousingOption,
+  JobCategory,
+  JobContactMethod,
+  JobEmploymentType,
+  JobPayType,
+  JobPostType,
+  VisaType,
+} from "@/types/job";
 
 const { t } = useI18n();
 const auth = useAuthStore();
@@ -24,6 +33,8 @@ const categories: JobCategory[] = [
 ];
 const employmentTypes: JobEmploymentType[] = ["PART_TIME", "FULL_TIME", "DAILY", "CONTRACT"];
 const payTypes: JobPayType[] = ["HOURLY", "DAILY", "MONTHLY", "PER_PROJECT"];
+const visaTypes: VisaType[] = ["E9", "E7", "H2", "F1", "F2", "F3", "F4", "F5", "F6", "D2", "D4", "D10", "G1", "UNDOCUMENTED", "OTHER"];
+const housingOptions: HousingOption[] = ["NOT_PROVIDED", "PROVIDED_FREE", "PROVIDED_PAID"];
 
 const activeTab = ref<"search" | "post">("search");
 const likedIds = ref<Set<string>>(new Set());
@@ -33,8 +44,12 @@ const searchForm = reactive({
   category: "" as JobCategory | "",
   employmentType: "" as JobEmploymentType | "",
   city: "",
+  acceptedVisa: "" as VisaType | "",
+  housingOption: "" as HousingOption | "",
 });
 const hasSearched = ref(false);
+
+const visaOptions = computed(() => visaTypes.map((v) => ({ value: v, label: t(`jobs.visaType.${v}`) })));
 
 async function loadLikedIds() {
   if (!auth.isAuthenticated) return;
@@ -52,6 +67,8 @@ async function runSearch() {
     category: searchForm.category || undefined,
     employment_type: searchForm.employmentType || undefined,
     city: searchForm.city || undefined,
+    accepted_visa: searchForm.acceptedVisa || undefined,
+    housing_option: searchForm.housingOption || undefined,
     page_size: 24,
   });
 }
@@ -64,9 +81,12 @@ const postForm = reactive({
   description: "",
   pay_type: "" as JobPayType | "",
   pay_amount: "",
+  overtime_pay_amount: "",
   city: "",
   requires_korean: false,
   visa_sponsorship: false,
+  accepted_visas: [] as VisaType[],
+  housing_option: "NOT_PROVIDED" as HousingOption,
   photos: [] as string[],
   contact_method: "PHONE" as JobContactMethod,
   contact_value: "",
@@ -93,9 +113,12 @@ async function handleSubmit() {
       description: postForm.description,
       pay_type: postForm.pay_type || undefined,
       pay_amount: postForm.pay_amount ? Number(postForm.pay_amount) : undefined,
+      overtime_pay_amount: postForm.overtime_pay_amount ? Number(postForm.overtime_pay_amount) : undefined,
       city: postForm.city || undefined,
       requires_korean: postForm.requires_korean,
       visa_sponsorship: postForm.visa_sponsorship,
+      accepted_visas: postForm.accepted_visas,
+      housing_option: postForm.housing_option,
       photos: postForm.photos,
       contact_method: postForm.contact_method,
       contact_value: postForm.contact_method === "PHONE" ? postForm.contact_value : undefined,
@@ -105,9 +128,12 @@ async function handleSubmit() {
     postForm.description = "";
     postForm.pay_type = "";
     postForm.pay_amount = "";
+    postForm.overtime_pay_amount = "";
     postForm.city = "";
     postForm.requires_korean = false;
     postForm.visa_sponsorship = false;
+    postForm.accepted_visas = [];
+    postForm.housing_option = "NOT_PROVIDED";
     postForm.photos = [];
     postForm.contact_method = "PHONE";
     postForm.contact_value = "";
@@ -194,6 +220,20 @@ onMounted(() => {
             <label class="label">{{ t("jobs.city") }}</label>
             <input v-model="searchForm.city" type="text" class="input" />
           </div>
+          <div class="w-44">
+            <label class="label">{{ t("jobs.visaFilterLabel") }}</label>
+            <select v-model="searchForm.acceptedVisa" class="input">
+              <option value="">{{ t("jobs.visaFilterAll") }}</option>
+              <option v-for="v in visaTypes" :key="v" :value="v">{{ t(`jobs.visaType.${v}`) }}</option>
+            </select>
+          </div>
+          <div class="w-44">
+            <label class="label">{{ t("jobs.housingOptionLabel") }}</label>
+            <select v-model="searchForm.housingOption" class="input">
+              <option value="">{{ t("jobs.housingFilterAll") }}</option>
+              <option v-for="h in housingOptions" :key="h" :value="h">{{ t(`jobs.housingOption.${h}`) }}</option>
+            </select>
+          </div>
           <BaseButton :loading="store.isLoading" @click="runSearch">
             <Search class="h-4 w-4" />
             {{ t("jobs.searchTab") }}
@@ -263,6 +303,13 @@ onMounted(() => {
           <BaseInput v-model="postForm.pay_amount" type="number" :label="t('jobs.payAmount')" :placeholder="t('jobs.payAmountPlaceholder')" />
         </div>
 
+        <BaseInput
+          v-model="postForm.overtime_pay_amount"
+          type="number"
+          :label="t('jobs.overtimePayAmount')"
+          :placeholder="t('jobs.overtimePayAmountPlaceholder')"
+        />
+
         <BaseInput v-model="postForm.city" :label="t('jobs.city')" />
 
         <label class="flex items-center gap-2 text-sm text-yulda-gray-700">
@@ -273,6 +320,33 @@ onMounted(() => {
           <input v-model="postForm.visa_sponsorship" type="checkbox" class="h-4 w-4 rounded border-yulda-gray-300" />
           {{ t("jobs.visaSponsorship") }}
         </label>
+
+        <div>
+          <label class="label">{{ t("jobs.acceptedVisasLabel") }}</label>
+          <MultiSelectDropdown
+            v-model="postForm.accepted_visas"
+            :options="visaOptions"
+            :label="t('jobs.acceptedVisasPlaceholder')"
+            :clear-label="t('jobs.clearVisas')"
+          />
+          <p class="mt-1.5 text-xs text-yulda-gray-400">{{ t("jobs.acceptedVisasHint") }}</p>
+        </div>
+
+        <div>
+          <label class="label">{{ t("jobs.housingOptionLabel") }}</label>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="h in housingOptions"
+              :key="h"
+              type="button"
+              class="rounded-full px-4 py-1.5 text-sm font-medium transition-colors"
+              :class="postForm.housing_option === h ? 'bg-yulda-black text-white' : 'bg-yulda-gray-100 text-yulda-gray-600 hover:bg-yulda-gray-200'"
+              @click="postForm.housing_option = h"
+            >
+              {{ t(`jobs.housingOption.${h}`) }}
+            </button>
+          </div>
+        </div>
 
         <div>
           <label class="label">{{ t("jobs.photosLabel") }}</label>
